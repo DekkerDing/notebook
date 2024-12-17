@@ -1,0 +1,32 @@
+{
+  "CN": "etcd",
+  "hosts": [
+    "127.0.0.1",
+    "192.168.10.100",
+    "192.168.10.107",
+    "192.168.10.108",
+    "192.168.10.109",
+    "192.168.10.200",
+    "192.168.10.300",
+    "ding-J4125",
+    "hp-desktop",
+    "dell-Inspiron-5555"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "name": [
+    {
+      "C": "CN",
+      "ST": "Beijing",
+      "L": "Beijing",
+      "O": "etcd",
+      "OU": "Etcd Security"
+
+    }
+  ]
+}
+
+
+// cfssl gencert -ca=etcd-ca.pem -ca-key=etcd-ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare ./etcd

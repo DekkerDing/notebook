@@ -1,0 +1,23 @@
+{
+  "CN":"etcd",
+  "key":{
+    "algo":"rsa",
+    "size":2048
+  },
+  "name":[
+    {
+      "C":"CN",
+      "ST":"Beijing",
+      "L":"Beijing",
+      "O":"etcd",
+      "OU":"Etcd Security"
+    }
+  ],
+  "ca":{
+    "expiry":"876000h"
+  }
+}
+
+
+
+// cfssl gencert -initca etcd-ca-csr.json | cfssljson -bare ./etcd-ca
