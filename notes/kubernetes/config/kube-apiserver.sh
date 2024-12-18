@@ -14,7 +14,6 @@ KUBE_APISERVER_OPTS="
 --enable-bootstrap-token-auth=true \
 --token-auth-file=/data/kubernetes/token/token.csv \
 
---kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \
 --kubelet-client-certificate=/data/kubernetes/ssl/apiserver.pem \
 --kubelet-client-key=/data/kubernetes/ssl/apiserver-key.pem \
 --kubelet-certificate-authority=/data/kubernetes/ssl/kubernetes-ca.pem \
@@ -24,7 +23,7 @@ KUBE_APISERVER_OPTS="
 
 --service-account-key-file=/data/kubernetes/ssl/kubernetes-ca-key.pem \
 --service-account-signing-key-file=/data/kubernetes/ssl/kubernetes-ca-key.pem \
---service-account-issuer=https://kubernetes.default.svc.cluster.local \
+--service-account-issuer=api \
 
 --etcd-cafile=/data/etcd/ssl/etcd-ca.pem \
 --etcd-certfile=/data/etcd/ssl/etcd.pem \
