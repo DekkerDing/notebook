@@ -8,7 +8,7 @@ KUBE_APISERVER_OPTS="
 --service-cluster-ip-range=10.96.0.0/12 \
 
 --authorization-mode=Node,RBAC \
---anonymous-auth=true \
+--anonymous-auth=false \
 --allow-privileged=true \
 --runtime-config=api/all=true \
 --enable-bootstrap-token-auth=true \
@@ -25,9 +25,6 @@ KUBE_APISERVER_OPTS="
 --service-account-signing-key-file=/data/kubernetes/ssl/kubernetes-ca-key.pem \
 --service-account-issuer=api \
 
---etcd-cafile=/data/etcd/ssl/etcd-ca.pem \
---etcd-certfile=/data/etcd/ssl/etcd.pem \
---etcd-keyfile=/data/etcd/ssl/etcd-key.pem \
 --etcd-servers=http://192.168.10.107:2379 \
 
 --requestheader-client-ca-file=/data/kubernetes/ssl/kubernetes-ca.pem \

@@ -1,0 +1,16 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+After=network.target
+
+[Service]
+EnvironmentFile=-/data/kubernetes/config/apiserver.conf
+ExecStart=/usr/local/bin/kube-apiserver $KUBE_APISERVER_OPTS
+StandardOutput=append:/data/kubernetes/logs/kube-apiserver.log
+StandardError=append:/data/kubernetes/logs/error/kube-apiserver.err
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65537
+
+[Install]
+WantedBy=multi-user.target
