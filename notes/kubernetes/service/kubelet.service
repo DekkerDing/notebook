@@ -1,0 +1,17 @@
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=-/data/kubernetes/config/kubelet.conf
+ExecStart=/usr/local/bin/kubelet $KUBELET_OPTS
+StandardOutput=append:/data/kubernetes/logs/kubelet.log
+StandardError=append:/data/kubernetes/logs/error/kubelet.err
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65537
+
+[Install]
+WantedBy=multi-user.target

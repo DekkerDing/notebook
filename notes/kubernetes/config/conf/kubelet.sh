@@ -1,0 +1,11 @@
+KUBELET_OPTS="
+--v=4 \
+--kubeconfig=/data/kubernetes/config/kubelet.kubeconfig \
+--bootstrap-kubeconfig=/data/kubernetes/config/kubelet-bootstrap.kubeconfig \
+--config=/data/kubernetes/config/kubelet.json \
+--cert-dir=/data/kubernetes/ssl \
+--runtime-request-timeout=15m  \
+--rotate-certificates \
+--container-runtime-endpoint=unix:///run/cri-dockerd.sock \
+--pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.9 \
+--cgroup-driver=systemd"
