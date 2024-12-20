@@ -93,3 +93,18 @@ modprobe -- ip_vs_sh
 modprobe -- nf_conntrack
 EOF
 chmod 755 /etc/sysconfig/modules/ipvs.modules && bash /etc/sysconfig/modules/ipvs.modules && lsmod | grep -e ip_vs -e nf_conntrack
+
+/etc/netplan
+01-network-manager-all.yaml
+
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp2s0:
+      dhcp4: no
+      addresses: [192.168.10.109/24]
+      gateway4: 192.168.10.1
+      nameservers:
+        addresses: [192.168.10.1,61.139.2.69]
