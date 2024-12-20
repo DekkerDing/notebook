@@ -1,0 +1,52 @@
+{
+  "default-ipc-mode": "shareable",
+  "data-root": "/data/docker",
+  "max-concurrent-downloads":10,
+  "log-driver":"json-file",
+  "log-opts":{
+    "max-size":"100m",
+    "max-file": "3"
+  },
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "storage-driver": "overlay2",
+  "registry-mirrors": 
+  [
+      "https://cmphayos.mirror.aliyuncs.com",
+      "https://dockerpull.com",
+      "https://docker.1panel.live",
+      "https://dockerproxy.net",
+      "https://atomhub.openatom.cn",
+      "https://dockerhub.jobcher.com",
+      "https://docker.registry.cyou",
+      "https://docker.awsl9527.cn",
+      "https://huecker.io",
+      "https://dockerhub.timeweb.cloud",
+      "https://noohub.ru",
+      "https://mirror.yandex.ru",
+      "https://dockerhub.icu",
+      "https://hub.rat.dev",
+      "https://dockerproxy.cn",
+      "https://docker.hpcloud.cloud",
+      "https://registry.docker-cn.com",
+      "https://docker.mirrors.ustc.edu.cn",
+      "https://dockerhub.azk8s.cn",
+      "https://docker-cf.registry.cyou",
+      "https://dockercf.jsdelivr.fyi",
+      "https://docker.jsdelivr.fyi",
+      "https://dockertest.jsdelivr.fyi",
+      "https://mirror.aliyuncs.com",
+      "https://dockerproxy.com",
+      "https://mirror.baidubce.com",
+      "https://docker.m.daocloud.io",
+      "https://docker.nju.edu.cn",
+      "https://docker.mirrors.sjtug.sjtu.edu.cn",
+      "https://mirror.iscas.ac.cn",
+      "https://docker.rainbond.cc",
+      "http://hub-mirror.c.163.com"
+  ],
+  "proxies": {
+    "http-proxy": "socks5://192.168.10.100:10808",
+    "https-proxy": "socks5://192.168.10.100:10808",
+    "no-proxy": "localhost,127.0.0.1,*.aliyuncs.com"
+  }
+}

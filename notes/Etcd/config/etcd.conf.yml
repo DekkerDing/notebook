@@ -99,7 +99,7 @@ client-transport-security:
   # key-file: /data/etcd/ssl/etcd-key.pem
 
   # Enable client cert authentication.
-  client-cert-auth: none
+  client-cert-auth: false
 
   # Path to the client server TLS trusted CA cert file.
   # trusted-ca-file: /data/etcd/ssl/etcd-ca.pem
