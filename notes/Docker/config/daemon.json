@@ -9,6 +9,7 @@
   },
   "exec-opts": ["native.cgroupdriver=systemd"],
   "storage-driver": "overlay2",
+  "dns" : [ "61.139.2.69","8.8.8.8" ],
   "registry-mirrors": 
   [
       "https://cmphayos.mirror.aliyuncs.com",
