@@ -8,7 +8,7 @@ mirrors.tuna.tsinghua.edu.cn
 
 sudo apt-get update && sudo apt-get upgrade
 
-apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++
+apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat
 
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -142,3 +142,35 @@ shopt -s histappend
 #bind '"\e[B": history-search-forward'
 
 source /etc/bash.bashrc
+
+
+# 使用Fail2Ban 来防止暴力破解攻击
+sudo apt install fail2ban
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+
+# 查看 分析 磁盘使用情况
+sudo apt install ncdu
+ncdu /
+
+#删除7天前的日志
+sudo journalctl --vacuum-time=7d
+
+#删除日志文件大于500M的日志 限制为500MB
+sudo journalctl --vacuum-size=500M
+
+#删除未使用的容器、网络、卷和镜像
+docker system prune -a
+#删除未使用的卷
+docker volume prune
+#清理未使用的镜像
+docker image prune -a
+
+#查看磁盘I/O消耗
+iotop
+
+#追踪文件系统操作
+fatrace
+
+#评估I/O性能的软件 sudo apt-get install sysstat
+iostat
