@@ -1,4 +1,4 @@
-docker run
+docker run \
 -itd \
 --restart=always \
 --privileged \
