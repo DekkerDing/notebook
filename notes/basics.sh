@@ -1,5 +1,9 @@
 ufw disable
 
+#禁用 Snap 服务
+sudo systemctl disable snapd.service
+sudo systemctl stop snapd.service
+
 mirrors.ustc.edu.cn
 
 mirrors.aliyun.com
@@ -8,7 +12,7 @@ mirrors.tuna.tsinghua.edu.cn
 
 sudo apt-get update && sudo apt-get upgrade
 
-apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat powertop
+apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat powertop make deborphan
 
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -22,6 +26,9 @@ sudo apt-get update
 
 apt-cache madison docker-ce
 apt-cache madison docker-ce-cli
+
+#自动清理未使用的旧版本
+sudo snap set system refresh.retain=2
 
 #安装最新版
 sudo apt-get install -y docker-ce
@@ -163,6 +170,11 @@ sudo systemctl start fail2ban
 sudo apt install ncdu
 ncdu /
 
+#查看未被任何程序依赖的库文件 来删除不再需要的孤立包
+sudo deborphan
+sudo apt-get remove --purge $(deborphan)
+
+
 #删除7天前的日志
 sudo journalctl --vacuum-time=7d
 
@@ -171,6 +183,13 @@ sudo journalctl --vacuum-size=500M
 
 #vacuum-files选项会清除所有低于指定数量的日志文件 因此在上面的例子中 只有最后两个日志文件被保留其他的都被删除 同样这只对存档的文件有效
 sudo journalctl --vacuum-files=3
+
+#清理历史日志文件
+sudo find /var/log -type f -name "*.log" -delete
+sudo truncate -s 0 /var/log/syslog
+sudo truncate -s 0 /var/log/auth.log
+sudo rm -rf /var/lib/snapd/cache
+
 
 #删除未使用的容器、网络、卷和镜像
 docker system prune -a
@@ -193,3 +212,27 @@ cat <<EOF >>  ~/.bashrc
 PS1='[\[\e[34;1m\]\u@\[\e[0m\]\[\e[32;1m\]\H\[\e[0m\]\[\e[31;1m\] \W\[\e[0m\]]# '
 EOF
 source ~/.bashrc
+
+#经常清理 apt 缓存
+sudo apt clean
+sudo apt-get clean
+
+#临时文件清理
+sudo rm -rf /tmp/*
+sudo rm -rf ~/.cache/*
+
+#删除不再需要的包
+sudo apt-get autoremove
+#清除缓存
+sudo apt-get clean
+#删除过时的包文件
+sudo apt-get autoclean
+
+#杀毒软件
+sudo apt-get install clamav clamav-daemon
+freshclam
+
+#CCleaner
+sudo apt install bleachbit
+export DISPLAY=:0
+sudo bleachbit --clean system.cache system.tmp
