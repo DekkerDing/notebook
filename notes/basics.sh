@@ -89,9 +89,12 @@ systemctl restart systemd-journald
 
 #关闭firewalld配置iptabes
 systemctl stop firewalld && systemctl disable firewalld
-yum -y install iptables-services && systemctl start iptables && systemctl enable iptables && iptables -F && iptables-save > /etc/sysconfig/iptables
+apt -y install iptables-services && systemctl start iptables && systemctl enable iptables && iptables -F && iptables-save > /etc/sysconfig/iptables
 
 modprobe br_netfilter
+
+mkdir -p /etc/sysconfig/modules
+
 cat > /etc/sysconfig/modules/ipvs.modules <<EOF
 #!/bin/bash
 modprobe -- ip_vs
@@ -174,3 +177,9 @@ fatrace
 
 #评估I/O性能的软件 sudo apt-get install sysstat
 iostat
+
+#shell 编辑器格式美化
+cat <<EOF >>  ~/.bashrc
+PS1='[\[\e[34;1m\]\u@\[\e[0m\]\[\e[32;1m\]\H\[\e[0m\]\[\e[31;1m\] \W\[\e[0m\]]# '
+EOF
+source ~/.bashrc
