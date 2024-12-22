@@ -12,7 +12,7 @@ mirrors.tuna.tsinghua.edu.cn
 
 sudo apt-get update && sudo apt-get upgrade
 
-apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat powertop make deborphan
+apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat powertop make deborphan lrzsz
 
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -77,26 +77,35 @@ ntpdate ntp1.aliyun.com
 #关闭postfix
 systemctl stop postfix && systemctl disable postfix
 
-mkdir /var/log/journal
-mkdir /etc/systemd/journald.conf.d
-cat > /etc/systemd/journald.conf.d/99-prophet.conf <<EOF
-[Journal]
-#持久化保存到磁盘
-Storage=persistent
-#压缩历史日志
-Compress=yes
-SyncIntervalSec=5m
-RateLimitInterval=30s
-RateLimitBurst=1000
-#最大占用空间10G
-SystemMaxUse=10G
-#单日志文件最大 200M
-SystemMaxFileSize=200M
-#日志保存时间2周
-MaxRetentionsSec=2week
-#不将日志转发到syslog
-ForwardToSyslog=no
-EOF
+vim /etc/logrotate.conf
+
+# see "man logrotate" for details
+
+# global options do not affect preceding include directives
+
+# rotate log files weekly 每天清理 系统日志
+daily
+
+# use the adm group by default, since this is the owning group
+# of /var/log/syslog. 指定那些用户操作
+su root ding
+
+# keep 4 weeks worth of backlogs 保留文件数量
+rotate 3
+
+# create new (empty) log files after rotating old ones
+create
+
+# use date as a suffix of the rotated file
+#dateext
+
+# uncomment this if you want your log files compressed
+#compress
+
+# packages drop log rotation information into this directory
+include /etc/logrotate.d
+
+# system-specific logs may also be configured here.
 
 systemctl restart systemd-journald
 
