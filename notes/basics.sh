@@ -1,14 +1,15 @@
 ufw disable
 
 #禁用 Snap 服务
+sudo snap set system refresh.retain=2
+sudo rm -rf /var/lib/snapd/cache
+sudo du -sh /var/lib/snapd
 sudo systemctl disable snapd.service
 sudo systemctl stop snapd.service
-
-mirrors.ustc.edu.cn
-
-mirrors.aliyun.com
-
-mirrors.tuna.tsinghua.edu.cn
+sudo apt-get purge snapd
+sudo rm -rf /var/cache/snapd/
+sudo rm -rf /var/lib/snapd/
+sudo rm -rf ~/snap
 
 sudo apt-get update && sudo apt-get upgrade
 
@@ -26,9 +27,6 @@ sudo apt-get update
 
 apt-cache madison docker-ce
 apt-cache madison docker-ce-cli
-
-#自动清理未使用的旧版本
-sudo snap set system refresh.retain=2
 
 #安装最新版
 sudo apt-get install -y docker-ce
@@ -190,12 +188,12 @@ source /etc/bash.bashrc
 
 
 # 使用Fail2Ban 来防止暴力破解攻击
-sudo apt install fail2ban
+sudo apt install -y fail2ban
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
 # 查看 分析 磁盘使用情况
-sudo apt install ncdu
+sudo apt install -y ncdu
 ncdu /
 
 #查看未被任何程序依赖的库文件 来删除不再需要的孤立包
