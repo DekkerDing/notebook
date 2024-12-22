@@ -41,6 +41,22 @@ sudo apt-mark docker-ce-cli
 sudo apt-mark docker-buildx-plugin
 sudo apt-mark docker-compose-plugin
 
+
+systemctl daemon-reload
+systemctl enable --now docker
+systemctl status docker | grep Active
+journalctl -u docker -f
+
+
+systemctl daemon-reload
+systemctl restart docker
+sleep 2
+systemctl status docker | grep Active
+journalctl -u docker -f
+
+
+systemctl enable docker
+
 sudo apt-get install containerd.io
 
 
