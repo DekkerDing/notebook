@@ -24,7 +24,7 @@ vm.max_map_count = 655360
 vm.overcommit_memory = 1
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
-net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.all.disable_ipv6 = 0
 kernel.unknown_nmi_panic = 0
 kernel.sysrq = 1
 fs.file-max = 1000000
@@ -47,6 +47,15 @@ net.ipv4.neigh.default.gc_thresh3 = 8192
 #net.netfilter.nf_conntrack_tcp_timeout_time_wait = 30
 #net.nf_conntrack_max = 1000000
 #net.netfilter.nf_conntrack_max = 1000000
+net.ipv4.tcp_congestion_control = bbr
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_fack = 1
+net.ipv4.tcp_dsack = 1
+net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_retries1 = 3
+net.ipv4.tcp_retries2 = 5
+net.ipv4.tcp_fastopen = 3
+net.ipv4.neigh.default.gc_stale_time = 90
 EOF
 
 sysctl -p

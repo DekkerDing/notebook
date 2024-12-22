@@ -8,7 +8,7 @@ mirrors.tuna.tsinghua.edu.cn
 
 sudo apt-get update && sudo apt-get upgrade
 
-apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat
+apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop-c sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++ sysstat powertop
 
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -40,6 +40,10 @@ sudo apt-get install containerd.io
 
 ulimit -SHn 65535
 
+echo "ulimit -HSn 65535" >> /etc/rc.local
+echo "ulimit -HSn 65535" >> /etc/.bash_profile
+echo "ulimit -SHn 65535" >> /etc/profile
+
 cat <<EOF >> /etc/security/limits.conf
 soft nofile 655360
 hard nofile 131072
@@ -47,8 +51,11 @@ soft nproc 655350
 hard nproc 655350
 soft memlock unlimited
 hard memlock unlimited
+soft stack 10204
+hard stack 32768
+soft stack 10204
+hard stack 32768
 EOF
-
 
 timedatectl set-timezone Asia/Shanghai
 #将当前的 UTC 时间写入硬件时钟
@@ -161,6 +168,9 @@ sudo journalctl --vacuum-time=7d
 
 #删除日志文件大于500M的日志 限制为500MB
 sudo journalctl --vacuum-size=500M
+
+#vacuum-files选项会清除所有低于指定数量的日志文件 因此在上面的例子中 只有最后两个日志文件被保留其他的都被删除 同样这只对存档的文件有效
+sudo journalctl --vacuum-files=3
 
 #删除未使用的容器、网络、卷和镜像
 docker system prune -a
