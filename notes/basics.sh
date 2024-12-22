@@ -1,4 +1,6 @@
 ufw disable
+sudo systemctl disable ufw.service
+sudo systemctl stop ufw.service
 
 #禁用 Snap 服务
 sudo snap set system refresh.retain=2
@@ -10,6 +12,14 @@ sudo apt-get purge snapd
 sudo rm -rf /var/cache/snapd/
 sudo rm -rf /var/lib/snapd/
 sudo rm -rf ~/snap
+
+#关闭打印机
+sudo systemctl disable cups.service
+sudo systemctl stop cups.service
+
+#关闭邮件服务器
+sudo systemctl disable postfix.service
+sudo systemctl stop postfix.service
 
 sudo apt-get update && sudo apt-get upgrade
 
