@@ -1,6 +1,14 @@
 ufw disable
 
-apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget
+mirrors.ustc.edu.cn
+
+mirrors.aliyun.com
+
+mirrors.tuna.tsinghua.edu.cn
+
+sudo apt-get update && sudo apt-get upgrade
+
+apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common wget iotop sysstat htop vim  preload unzip pciutils net-tools dnsutils gcc g++
 
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -108,3 +116,29 @@ network:
       gateway4: 192.168.10.1
       nameservers:
         addresses: [192.168.10.1,61.139.2.69]
+
+sudo netplan apply
+
+
+#设置history记录全部操作记录
+# vim /etc/bash.bashrc #将下面这段内容添加到，并执行bash即可
+
+# format history
+
+# save in ~/.bashrc
+
+USER_IP=`who -u am i 2>/dev/null| awk '{print $NF}'|sed -e 's/[()]//g'`
+
+export HISTTIMEFORMAT="%Y-%m-%d %H:%M:%S  `whoami`@${USER_IP}: "
+
+export HISTFILESIZE=1000000
+
+export PROMPT_COMMAND="history -a; history -r;  $PROMPT_COMMAND"
+
+shopt -s histappend
+
+#bind '"\e[A": history-search-backward'
+
+#bind '"\e[B": history-search-forward'
+
+source /etc/bash.bashrc
