@@ -11,9 +11,6 @@ server.name: "kibana"
 # Kibana 将接受来自客户端的最大负载大小（字节）。
 server.maxPayloadBytes: 1048576
 
-# 控制台的 Kibana 服务器名称。
-console.name: "console"
-
 # 默认地区设置。每个会话可以更改。
 i18n.locale: "zh-CN"
 
@@ -37,11 +34,7 @@ kibana.index: ".kibana"
 # migrationAssistant.index: ".kibana-1.1-migration-assistant"
 
 # 如果您需要为您的 Kibana 实例启用 CORS，请取消注释并配置以下值。
-cors:
-  origin: "*"
-  methods: ["GET", "POST", "PUT", "DELETE"]
-  headers: ["X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length"]
-  credentials: true
+
 
 # 默认加载的应用当用户访问 Kibana 时界面将直接打开“Discover”应用这个设置可以帮助用户快速进入他们最常使用的功能提高工作效率。
 kibana.defaultAppId: "discover"
@@ -61,17 +54,14 @@ telemetry.optIn: false
 # 禁用 X-Pack Fleet，以减少资源消耗。
 xpack.fleet.enabled: false
 
-#设置日志级别，可以是 error、warning、info、debug 或 trace
-logging.level: info
-
 #设置日志文件的存储路径。可以是相对路径或绝对路径。如果未设置，Kibana 将日志输出到控制台
 # logging.dest: stdout
 
 #设置日志文件在被轮换前的 size=最大文件大小 keepFiles=设置需要保留的日志文件数量 interval=设置日志文件轮换的时间间隔
-logging.rotate:
-  size: 100mb
-  keepFiles: 7
-  interval: 1d
+#设置日志级别，可以是 error、warning、info、debug 或 trace
+logging:
+  rotate:
+    keepFiles: 7
 
 #日志输出格式
 logging.json: true
@@ -81,6 +71,3 @@ logging.quiet: false
 
 #设置为 true 时，将输出额外的日志信息。
 logging.verbose: false
-
-#设置自动刷新间隔为50秒 0  # 禁用自动刷新
-autoRefreshInterval: 50000

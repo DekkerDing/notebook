@@ -34,7 +34,7 @@ docker run -itd \
 --name kibana \
 -p 5601:5601 \
 --tty \
---user 0 \
+--user kibana:kibana \
 --privileged=true \
 --restart=always \
 -e "TZ=Asia/Shanghai" \
