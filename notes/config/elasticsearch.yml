@@ -89,7 +89,7 @@ xpack.monitoring.collection.enabled: false  # 禁用监控以节省资源
 # xpack.ccr.enabled: false  # 禁用跨集群复制以节省资源
 
 # ---------------------------------- ILM ----------------------------------
-# indices.lifecycle.polling_interval: -1  # 禁用 ILM 以节省资源
+# indices.lifecycle.poll_interval: -1  # 禁用 ILM 以节省资源
 
 # ---------------------------------- 字段数据断路器 ----------------------------------
 # 禁用文件缓存以节省内存

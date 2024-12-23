@@ -24,9 +24,6 @@ elasticsearch:7.17.1
 
 docker exec -it elasticsearch bash -c "echo 'vm.max_map_count=262144'>>/etc/sysctl.conf && sysctl -p"
 
-echo "vm.max_map_count=262144" >> /etc/sysctl.conf
-sysctl -w vm.max_map_count=262144
-
 #验证
 http://IP:9200/_cat/nodes?v=true&pretty
 
