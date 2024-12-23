@@ -60,3 +60,27 @@ telemetry.optIn: false
 
 # 禁用 X-Pack Fleet，以减少资源消耗。
 xpack.fleet.enabled: false
+
+#设置日志级别，可以是 error、warning、info、debug 或 trace
+logging.level: info
+
+#设置日志文件的存储路径。可以是相对路径或绝对路径。如果未设置，Kibana 将日志输出到控制台
+# logging.dest: stdout
+
+#设置日志文件在被轮换前的 size=最大文件大小 keepFiles=设置需要保留的日志文件数量 interval=设置日志文件轮换的时间间隔
+logging.rotate:
+  size: 100mb
+  keepFiles: 7
+  interval: 1d
+
+#日志输出格式
+logging.json: true
+
+#设置为 true 时，将禁止所有日志输出
+logging.quiet: false
+
+#设置为 true 时，将输出额外的日志信息。
+logging.verbose: false
+
+#设置自动刷新间隔为50秒 0  # 禁用自动刷新
+autoRefreshInterval: 50000

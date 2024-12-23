@@ -23,11 +23,19 @@ docker run -itd \
 -v /data/elasticsearch/temp:/usr/share/elasticsearch/temp \
 elasticsearch:7.17.1
 
-docker run -d \
+#验证
+http://IP:9200/_cat/nodes?v=true&pretty
+
+docker run -itd \
 --name kibana \
--e ELASTICSEARCH_HOSTS=http://es:9200 \
---network=es-net \
 -p 5601:5601 \
+--tty \
+--user 0 \
+--privileged=true \
+--restart=always \
+-e "TZ=Asia/Shanghai" \
+-v /etc/localtime:/etc/localtime:ro \
+-v /data/elasticsearch/config:/usr/share/kibana/config \
 kibana:7.17.1
 
 https://release.infinilabs.com/analysis-ik/stable/
