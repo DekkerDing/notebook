@@ -35,7 +35,7 @@ docker run -itd \
 --restart=always \
 -e "TZ=Asia/Shanghai" \
 -v /etc/localtime:/etc/localtime:ro \
--v /data/elasticsearch/config:/usr/share/kibana/config \
+-v /data/elasticsearch/config/kibana.yml:/usr/share/kibana/config/kibana.yml \
 kibana:7.17.1
 
 https://release.infinilabs.com/analysis-ik/stable/
