@@ -1,0 +1,134 @@
+# ======================== Elasticsearch 配置 =========================
+#
+# 注意：Elasticsearch 提供了大多数设置的合理默认值。
+#       在调整和优化配置之前，请确保您了解自己的目标和后果。
+#
+# 配置节点的主要方式是通过此文件。此模板列出了您可能需要为生产集群配置的最重要的设置。
+#
+# 有关配置选项的更多信息，请参考文档：
+# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+#
+# ---------------------------------- 集群 -----------------------------------
+cluster.name: elasticsearch-cluster
+cluster.initial_master_nodes: [["192.168.10.107:9300","192.168.10.108:9300"]
+
+# ------------------------------------ 节点 ------------------------------------
+node.name: j4125
+
+# ----------------------------------- 路径 ------------------------------------
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# ----------------------------------- 内存 -----------------------------------
+bootstrap.memory_lock: true
+bootstrap.system_call_filter: false  # 禁用系统调用过滤器以减少内存使用
+
+# ---------------------------------- 网络 -----------------------------------
+network.host: 0.0.0.0
+http.port: 9200
+http.cors.enabled: true
+http.cors.allow-origin: *
+
+# --------------------------------- 发现 ----------------------------------
+discovery.seed_hosts: ["192.168.10.107:9300","192.168.10.108:9300", "192.168.10.109:9300"]
+discovery.zen.minimum_master_nodes: 2
+
+# ---------------------------------- 网关 -----------------------------------
+gateway.recover_after_nodes: 2
+gateway.recover_after_time: 5m
+gateway.expected_nodes: 3
+
+# ---------------------------------- 其他 -----------------------------------
+action.destructive_requires_name: true
+
+# ---------------------------------- 安全 -----------------------------------
+# xpack.security.enabled: false  # 如果不需要，禁用 X-Pack 安全功能
+
+# ---------------------------------- 线程池 ----------------------------------
+thread_pool.index.queue_size: 1000  # 调整索引线程池队列的大小
+thread_pool.search.queue_size: 1000  # 调整搜索线程池队列的大小
+
+# ---------------------------------- 缓存 -----------------------------------
+indices.cache.request.enabled: false  # 禁用请求缓存以节省内存
+
+# ---------------------------------- HTTP -----------------------------------
+http.compression: false  # 禁用 HTTP 压缩以节省 CPU 周期
+http.max_content_length: 100mb  # 限制 HTTP 请求的最大内容长度
+
+# ---------------------------------- 地理信息 -----------------------------------
+ingest.geoip.downloader.enabled: true  # 它用于控制 Ingest GeoIP 处理器的 GeoIP 数据库下载功能以确保地理位置信息是最新的
+
+# ---------------------------------- GC 日志 ----------------------------------
+# 调整 GC 日志级别以减少详细程度并节省磁盘空间
+logger.org.apache.lucene.index: INFO
+logger.org.elasticsearch.index.shard: INFO
+logger.org.elasticsearch.search.slowlog: TRACE
+
+# ---------------------------------- 审计 -----------------------------------
+# xpack.audit.enabled: false  # 禁用审计日志以节省资源
+
+# ---------------------------------- 监控 ----------------------------------
+xpack.monitoring.collection.enabled: false  # 禁用监控以节省资源
+
+# ---------------------------------- 观察者 ----------------------------------
+# xpack.watcher.enabled: false  # 禁用观察者以节省资源
+
+# ---------------------------------- SQL ----------------------------------
+# xpack.sql.enabled: false  # 禁用 SQL 以节省资源
+
+# ---------------------------------- 机器学习 ----------------------------------
+# xpack.ml.enabled: false  # 禁用机器学习以节省资源
+
+# ---------------------------------- 日志stash ----------------------------------
+# xpack.logstash.enabled: false  # 禁用日志stash以节省资源
+
+# ---------------------------------- 图形 ----------------------------------
+# xpack.graph.enabled: false  # 禁用图形以节省资源
+
+# ---------------------------------- 滚动 ----------------------------------
+# xpack.rollup.enabled: false  # 禁用滚动以节省资源
+
+# ---------------------------------- CCR ----------------------------------
+# xpack.ccr.enabled: false  # 禁用跨集群复制以节省资源
+
+# ---------------------------------- ILM ----------------------------------
+# indices.lifecycle.polling_interval: -1  # 禁用 ILM 以节省资源
+
+# ---------------------------------- 平坦文件 ----------------------------------
+# 禁用平坦文件缓存以节省内存
+indices.breaker.flatfile.overhead: 1
+
+# ---------------------------------- 断路器 ----------------------------------
+# 调整断路器限制以防止内存溢出错误
+indices.breaker.fielddata.limit: 60%
+indices.breaker.request.limit: 40%
+indices.breaker.total.limit: 80%
+indices.breaker.in_flight_requests.limit: 20
+
+# ---------------------------------- 查询缓存 ----------------------------------
+# 用于配置查询缓存的大小存储了最近执行的查询及其结果以便快速响应相同的后续查询
+indices.queries.cache.size: 5%
+indices.fielddata.cache.size: 5%
+
+# ---------------------------------- 刷新间隔 ----------------------------------
+# 禁用索引的刷新间隔以节省 CPU 和 I/O 资源
+index.refresh_interval: -1
+
+# ---------------------------------- 合并调度器 ----------------------------------
+# 调整合并调度器设置以减少 I/O
+index.merge.scheduler.max_thread_count: 1
+index.merge.scheduler.auto_throttle: true
+
+# ---------------------------------- 分配 ----------------------------------
+# 禁用分片分配过滤以允许重新平衡
+cluster.routing.allocation.enable: all
+
+# ---------------------------------- 慢日志 ----------------------------------
+# 调整慢日志设置以仅捕获显著的慢查询
+index.search.slowlog.threshold.query.warn: 10s
+index.search.slowlog.threshold.fetch.warn: 1s
+index.indexing.slowlog.threshold.index.warn: 10s
+
+# ----------------------------------JVM GC 选项 ----------------------------------
+# 调整 GC 选项以减少停顿时间
+es.java.opts: "-Xms512m -Xmx512m -XX:+UseG1GC -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:ParallelGCThreads=4"

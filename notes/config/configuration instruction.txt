@@ -1,0 +1,29 @@
+配置参数的作用：
+集群名称（cluster.name）：定义集群的名称，同一集群内的所有节点必须有相同的名称。
+节点名称（node.name）：定义节点的名称，用于在集群中标识节点。
+数据路径（path.data）：定义数据存储的路径。
+日志路径（path.logs）：定义日志文件存储的路径。
+内存锁定（bootstrap.memory_lock）：启用内存锁定，防止Elasticsearch使用交换空间。
+系统调用过滤器（bootstrap.system_call_filter）：禁用系统调用过滤器可以减少内存使用。
+JVM选项（es.java.opts）：设置JVM的启动参数，如堆内存大小。
+网络主机（network.host）：设置节点绑定的网络接口。
+HTTP端口（http.port）：设置HTTP服务监听的端口。
+发现种子主机（discovery.seed_hosts）：设置用于集群发现的主机列表。
+最小主节点数（discovery.zen.minimum_master_nodes）：设置形成 quorum 所需的最小主节点数，防止“脑裂”。
+网关恢复节点数（gateway.recover_after_nodes）：设置集群恢复前需要连接的节点数。
+网关恢复时间（gateway.recover_after_time）：设置集群恢复前等待的时间。
+网关预期节点数（gateway.expected_nodes）：设置集群中预期的节点数。
+破坏性操作需要索引名称（action.destructive_requires_name）：要求在执行破坏性操作时指定索引名称。
+线程池队列大小（thread_pool.index.queue_size 和 thread_pool.search.queue_size）：调整索引和搜索线程池的队列大小。
+请求缓存（indices.cache.request.enabled）：禁用请求缓存以节省内存。
+HTTP压缩（http.compression）：禁用HTTP压缩以节省CPU周期。
+HTTP最大内容长度（http.max_content_length）：限制HTTP请求的最大内容长度。
+GC日志级别（logger.org.apache.lucene.index 等）：调整GC日志级别以减少详细程度并节省磁盘空间。
+监控（xpack.monitoring.collection.enabled）：禁用监控以节省资源。
+断路器限制（indices.breaker.fielddata.limit 等）：调整断路器限制以防止内存溢出错误。
+刷新间隔（index.refresh_interval）：禁用索引的刷新间隔以节省CPU和I/O资源。
+合并调度器（index.merge.scheduler.max_thread_count 和 index.merge.scheduler.auto_throttle）：调整合并调度器设置以减少I/O。
+分片分配过滤（cluster.routing.allocation.enable）：禁用分片分配过滤以允许重新平衡。
+慢日志（index.search.slowlog.threshold.query.warn 等）：调整慢日志设置以仅捕获显著的慢查询。
+GC选项（es.java.opts）：调整GC选项以减少停顿时间。
+这些配置项和它们的作用可以帮助您更好地理解和调整Elasticsearch的配置，以适应您的具体需求和环境。在应用这些配置之前，请确保您了解每个设置的影响，并在生产环境中进行充分的测试。

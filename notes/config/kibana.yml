@@ -1,0 +1,62 @@
+# ---------------------------------- Kibana 设置 ----------------------------------
+# Kibana 由后端服务器提供服务。此设置控制使用的端口。
+server.port: 5601
+
+# 服务器绑定的地址。
+server.host: "0.0.0.0"
+
+# 如果您在负载均衡器后运行多个 Kibana 实例，请指定均衡器名称以启用功能，如 Kibana 的自动刷新。
+server.name: "kibana"
+
+# Kibana 将接受来自客户端的最大负载大小（字节）。
+server.maxPayloadBytes: 1048576
+
+# 控制台的 Kibana 服务器名称。
+console.name: "console"
+
+# 默认地区设置。每个会话可以更改。
+i18n.locale: "zh-CN"
+
+# Elasticsearch 实例的 URL（由 xpack.security.encryption 保护）。
+elasticsearch.hosts: ["http://192.168.10.107:9200"]
+
+# 如果您的 Elasticsearch 使用 SSL，确保 Kibana 也使用 SSL。
+# elasticsearch.ssl:
+#   certificateAuthorities:
+#     - /path/to/your/CA.pem
+#   certificate: /path/to/your/client.crt
+#   key: /path/to/your/client.key
+
+# Kibana 索引包含保存的仪表板、可视化和搜索。
+# 如果您运行多个 Kibana 实例，它们应该都指向同一个 Kibana 索引。
+# 这个索引应该在 Elasticsearch 中创建。
+kibana.index: ".kibana"
+
+# Elasticsearch 索引包含 Kibana 1.0 迁移。
+# 迁移到 Kibana 1.1 完成后，可以删除此索引。
+# migrationAssistant.index: ".kibana-1.1-migration-assistant"
+
+# 如果您需要为您的 Kibana 实例启用 CORS，请取消注释并配置以下值。
+cors:
+  origin: "*"
+  methods: ["GET", "POST", "PUT", "DELETE"]
+  headers: ["X-Requested-With", "X-Auth-Token", "Content-Type", "Content-Length"]
+  credentials: true
+
+# 默认加载的应用当用户访问 Kibana 时界面将直接打开“Discover”应用这个设置可以帮助用户快速进入他们最常使用的功能提高工作效率。
+kibana.defaultAppId: "discover"
+
+# 禁用采样数据收集，以减少资源消耗。
+telemetry.optIn: false
+
+# 禁用 X-Pack 安全特性，如果您不需要它们。
+# xpack.security.enabled: false
+
+# 禁用 X-Pack 报告，以减少资源消耗。
+# xpack.reporting.enabled: false
+
+# 禁用 X-Pack 监视，以减少资源消耗。
+# xpack.monitoring.enabled: false
+
+# 禁用 X-Pack Fleet，以减少资源消耗。
+xpack.fleet.enabled: false
