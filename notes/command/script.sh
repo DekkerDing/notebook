@@ -11,7 +11,6 @@ docker run -itd \
 --user 0 \
 --ulimit memlock=-1:-1 \
 --ulimit nproc=65535:65535 \
---sysctl vm.max_map_count=262144 \
 --privileged=true \
 --restart=always \
 -e "TZ=Asia/Shanghai" \
@@ -22,6 +21,11 @@ docker run -itd \
 -v /data/elasticsearch/config:/usr/share/elasticsearch/config \
 -v /data/elasticsearch/temp:/usr/share/elasticsearch/temp \
 elasticsearch:7.17.1
+
+docker exec -it elasticsearch bash -c "echo 'vm.max_map_count=262144'>>/etc/sysctl.conf && sysctl -p"
+
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+sysctl -w vm.max_map_count=262144
 
 #验证
 http://IP:9200/_cat/nodes?v=true&pretty
