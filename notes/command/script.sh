@@ -7,6 +7,7 @@ docker run -itd \
 --name elasticsearch \
 -p 9200:9200 \
 -p 9300:9300 \
+--net=host \
 --tty \
 --user 0 \
 --ulimit memlock=-1:-1 \
@@ -30,6 +31,7 @@ http://IP:9200/_cat/nodes?v=true&pretty
 docker run -itd \
 --name kibana \
 -p 5601:5601 \
+--net=host \
 --tty \
 --user kibana:kibana \
 --privileged=true \
