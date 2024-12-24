@@ -9,9 +9,13 @@ sudo du -sh /var/lib/snapd
 sudo systemctl disable snapd.service
 sudo systemctl stop snapd.service
 sudo apt-get purge snapd
-sudo rm -rf /var/cache/snapd/
-sudo rm -rf /var/lib/snapd/
+sudo rm -rf /var/cache/snapd
+sudo rm -rf /var/lib/snapd
+sudo rm -rf /snap
 sudo rm -rf ~/snap
+
+#禁止APT重新安装Snap
+echo -e "Package: snapd\nPin: release a*\nPin-Priority: -10" | sudo tee /etc/apt/preferences.d/nosnap.pref
 
 #关闭打印机
 sudo systemctl disable cups.service
@@ -224,7 +228,13 @@ sudo journalctl --vacuum-files=3
 sudo find /var/log -type f -name "*.log" -delete
 sudo truncate -s 0 /var/log/syslog
 sudo truncate -s 0 /var/log/auth.log
+sudo rm -rf /var/log/journal/*
+sudo rm -rf /var/lib/swcatalog
+sudo rm -rf /var/cache/swcatalog
 sudo rm -rf /var/lib/snapd/cache
+
+#检查日志文件大小
+du -sh /var/log/* | sort -hr
 
 
 #删除未使用的容器、网络、卷和镜像
@@ -263,12 +273,28 @@ sudo apt-get autoremove
 sudo apt-get clean
 #删除过时的包文件
 sudo apt-get autoclean
-
-#杀毒软件
-sudo apt-get install clamav clamav-daemon
-freshclam
+#删除过期的包
+sudo apt-get autoremove --purge
 
 #CCleaner
 sudo apt install bleachbit
 export DISPLAY=:0
 sudo bleachbit --clean system.cache system.tmp
+
+
+#列出目录占用情况
+du -h --max-depth=1 / | sort -hr
+
+#Ubuntu卸载程序
+sudo apt remove --purge xxx -y
+
+sudo apt-get remove --purge xxx* -y
+
+#清理相关的残留文件
+sudo apt autoremove -y
+sudo apt autoclean
+sudo rm -rf /var/lib/xxx
+sudo rm -rf /etc/xxx
+
+#清理日志文件
+sudo rm -rf /var/log/xxx/
