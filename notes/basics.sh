@@ -83,6 +83,14 @@ chmod +x /usr/local/bin/docker-compose
 sudo apt-get install containerd.io
 
 
+systemctl daemon-reload
+systemctl restart cri-docker
+sleep 2
+systemctl status cri-docker
+journalctl -u cri-docker -f
+
+systemctl enable cri-docker
+
 
 ulimit -SHn 65535
 
