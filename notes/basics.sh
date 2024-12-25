@@ -2,7 +2,16 @@ ufw disable
 sudo systemctl disable ufw.service
 sudo systemctl stop ufw.service
 
+#关闭swap分区
+sudo swapoff -a
+vim /etc/fstab
+# UUID=xxxx-xxxx-xxxx-xxxx swap swap defaults 0 0
+# /swap.img     none    swap    sw      0       0
+sudo rm -f /swap.img
+
+
 #禁用 Snap 服务
+#保留 2 个最近版本，其余版本将被清理
 sudo snap set system refresh.retain=2
 sudo rm -rf /var/lib/snapd/cache
 sudo du -sh /var/lib/snapd
@@ -65,7 +74,6 @@ systemctl restart docker
 sleep 2
 systemctl status docker | grep Active
 journalctl -u docker -f
-
 
 systemctl enable docker
 
@@ -159,7 +167,7 @@ modprobe -- nf_conntrack
 EOF
 chmod 755 /etc/sysconfig/modules/ipvs.modules && bash /etc/sysconfig/modules/ipvs.modules && lsmod | grep -e ip_vs -e nf_conntrack
 
-/etc/netplan
+cd /etc/netplan
 01-network-manager-all.yaml
 
 # Let NetworkManager manage all devices on this system
@@ -183,6 +191,7 @@ sudo netplan apply
 # format history
 
 # save in ~/.bashrc
+vim /etc/bash.bashrc
 
 USER_IP=`who -u am i 2>/dev/null| awk '{print $NF}'|sed -e 's/[()]//g'`
 
@@ -228,13 +237,17 @@ sudo journalctl --vacuum-files=3
 sudo find /var/log -type f -name "*.log" -delete
 sudo truncate -s 0 /var/log/syslog
 sudo truncate -s 0 /var/log/auth.log
-sudo rm -rf /var/log/journal/*
+sudo rm -rf /var/log/journal
+sudo rm -rf /var/log/installer
 sudo rm -rf /var/lib/swcatalog
 sudo rm -rf /var/cache/swcatalog
+sudo rm -rf /var/cache/apt/*
+sudo rm -rf /var/cache/snapd
+
 sudo rm -rf /var/lib/snapd/cache
 
 #检查日志文件大小
-du -sh /var/log/* | sort -hr
+du -sh /var/log/* | sort -h
 
 
 #删除未使用的容器、网络、卷和镜像
@@ -283,7 +296,7 @@ sudo bleachbit --clean system.cache system.tmp
 
 
 #列出目录占用情况
-du -h --max-depth=1 / | sort -hr
+du -h --max-depth=1 / | sort -h
 
 #Ubuntu卸载程序
 sudo apt remove --purge xxx -y
