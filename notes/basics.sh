@@ -48,6 +48,10 @@ sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/li
 
 sudo apt-get update
 
+#更新驱动程序
+sudo apt install ubuntu-drivers-common
+sudo ubuntu-drivers autoinstall
+
 apt-cache madison docker-ce
 apt-cache madison docker-ce-cli
 
@@ -191,7 +195,7 @@ network:
         addresses: [192.168.10.1,61.139.2.69]
 
 sudo netplan apply
-
+sudo systemctl restart networking
 
 #设置history记录全部操作记录
 # vim /etc/bash.bashrc #将下面这段内容添加到，并执行bash即可
@@ -319,3 +323,21 @@ sudo rm -rf /etc/xxx
 
 #清理日志文件
 sudo rm -rf /var/log/xxx/
+
+#禁止自动休眠
+systemctl status sleep.target
+#关闭系统的自动休眠开关
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+sudo systemctl set-default multi-user.target
+
+sudo vim /etc/systemd/logind.conf
+#文件中找到以下行两行的注释符号#移除，并设置IdleAction为ignore，IdleActionSec为0
+IdleAction=ignore
+IdleActionSec=0
+
+sudo systemctl restart systemd-logind.service
+
+
+#恢复自动休眠功能
+sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+sudo systemctl set-default graphical.target
