@@ -269,6 +269,11 @@ docker volume prune
 #清理未使用的镜像
 docker image prune -a
 
+#能够清晰展示系统的CPU和内存使用情况
+sudo apt install htop
+# 使用方向键上下移动查看进程 按 F6 可排序（如按内存、CPU 使用率）按 F10 退出
+htop
+
 #查看磁盘I/O消耗
 iotop
 
