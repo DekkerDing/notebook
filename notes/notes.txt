@@ -1,6 +1,182 @@
 Gradle 对象
     Project
         Gradle = project 1~N (类似 pom.xml 或 jar)
+        project == build.gradle(实例对象)
+
+        settings
+            多个层级 嵌套关系描述 基于 : 做为分割
+            include '父层级:子层级'
+
+        属性：
+            内置属性：
+                获取方式：
+                    println name 简化直接获取
+                    println(project.name)
+                    println(project.property("name"))
+
+                    编程式：
+                        //使用groovy语法进行编写 def pname :String= name
+                        println "groovy projectName" + pname
+
+                        //使用java语法进行编写
+                        String jname = "java projectName + project.name
+                        println jname
+                常用属性：
+                    allprojects： 包含此项目及其子项目的集合
+                    buildDir： 当前项目的编译目录（自动生成）默认值porjectDir/build
+                    defaultTasks： 当前项目的默认任务的名字集，当前构建没有提供任务名时会执行这些默认任务
+                    group： 当前项目的组名
+                    logger： 当前项目的日志器可以用来在 build 文件中写日志
+                    name： 此项目的名称
+                    parent： 此项目的父项目
+                    path： 这个项目的绝对路径
+                    project： 当前project对象实例
+                    rootDir： 本项目的根目录根目录是根项目的项目目录
+                    rootProject： 当前项目层次结构中的根project
+                    subprojects： 当前项目的子项目的集合
+                    tasks： 本项目的task集合
+                    version： 此项目的版本
+            扩展属性：
+                //关于扩展属性 扩展属性也称呼为额外属性 以 ext 声明
+                ext.prop1 = "extra prop1 first gradle
+                println (ext.prop1) println (propl)
+
+                以 闭包的形式定义扩展属性：
+                    ext {
+                            REPOSITORY_HOME：'http://maven.aliyun.com'
+                            REPOSITORY_URLl = REPOSITORY_HOME + "/nexus/content/groups/public"
+                    }
+
+                //我们可以在 project task subproject 这三个中去读写使用
+                子模块中使用参照如下：
+                    println ("first-orderl:" + parent.propl)
+                    println ("first-order2:" + prop1)
+            属性作用域：
+                读写属性时 Project会按照下面范围的顺序进行查找的在某个范围找到属性后就会返回该属性
+
+                如果没有找到，会抛出异常
+
+                Project对象自身
+                这个范围里的属性包含Project 实现类中定义有getters和setters方法的所有属性
+
+                比如：project.getName()
+                方法就对应了name属性
+
+                至于这些属性的可读写性取决于它们是否定义 getters 或者 setters 方法
+
+                Project的ext属性(extra)
+
+                每个Project都会维护一个额外属性的映射它可以包含任意的名称->值对定义后此作用域的属性是可读写的
+
+                比如：project.ext.prop1 ='it235"。
+                通过插件被添加到Project中的扩展属性（extensions）
+
+                每个扩展名都可以作为只读属性使用其名称与扩展名相同
+                比如：project.android.compilesdkVersion。
+                通过插件添加到Project中的约定属性（convention）
+                插件可以通过Project的Convention对象向 Project 中添加属性和方法此范围的属性的可读可写性取决于约束对象
+                Project中 Tasks
+                可以使用Task的名称作为属性名称来访问任务此范围的属性是只读的
+
+                ext 的属性和约定属性从项目的父级继承递归到根项目此范围的属性是只读的
+                Project >> Ext >> Plugins >> 约定属性 >> Tasks
+
+        方法：
+            内置方法：
+                defaultTasks("xxx") 为这个project指定默认执行的task
+                    设置此项目的默认任务的名称当开始构建时没有提供任务名称时使用这个
+                copy：
+                    复制指定的文件
+                apply：
+                    应用零个或多个插件或脚本
+                afterEvaluate：
+                    可以添加一个闭包它会在项目完成评估之后立即执行当执行属于该项目的构建文件时会通知此类监听器
+
+                allprojects:
+                    配置当前项目以及它的每个子项目
+
+                beforeEvaluate:
+                    添加一个闭包它会在项目开始评估之前立即执行
+
+                buildscript：
+                    配置当前gradle脚本自身需要使用的构建信息或依赖
+
+                repositories：
+
+                publishing：
+
+                configurations：
+
+                sourceSets：
+
+                artifacts：
+
+
+                uri：
+                    将文件路径解析为URI，相对于该项目的项目目录
+
+                task：
+                    创建Task口具有给定名称的a并将其添加到此项目中
+
+                subprojects：
+                    配置本项目的子项目
+
+                setProperty：
+                    设置此项目的属性此方法在以下位置搜索具有给定名称的属性并将该属性设置在它找到该属性的第一个位置
+
+                property：
+                    返回给定属性的值
+
+                mkdir：
+                    创建一个目录并返回一个指向它的文件
+
+                javaexec：
+                    执行 Java 主类执行外部Java进程
+
+                hasProperty：
+                    确定此项目是否具有给定的属性
+
+                getAllTasks：
+                    返回此项目中包含的任务的地图
+
+                findProperty：
+                    找特定属性如果未找到则返回给定属性的值或null
+
+                findProject：
+                    按路径定位项目如果路径是相对的则相对于该项目进行解释
+
+                file：
+                    解析相对于该项目的项目目录的文件路径
+
+                exec：
+                    执行外部命令
+
+                delete：
+                    删除文件和目录
+
+                configure：
+                    通过闭包配置对象集合
+
+                dependencies：
+                    implementation 项目运行时所需要的依赖
+                    testImplementation 在测试时所需要的依赖
+                    testRuntimeOnly
+                    classpath
+            作用域:
+                1. Project 对象自身
+
+                2. build.gradle 脚本文件
+
+                3. 通过插件添加到Project中的扩展（extensions）每个扩展都可以当做参数是闭包或Action的方法。
+                插件添加到项目中的约定方法（convention）插件可以通过项目的Convention对象向项目中添加属性和方法
+
+                4. 项目中的Tasks每个Task都会添加一个方法方法名是任务名参数是单个闭包或者Action该方法使用提供
+                的闭包为相关任务调用
+                Task.configure(groovy.lang.Closure)方法
+
+        插件：
+            脚本插件：
+            二进制插件：
     Task
         Gradle = 最小可执行单位 如 编译 打包 ..
         Project(Task ...)
@@ -10,5 +186,11 @@ Gradle 对象
                 -q : 输出 Quiet 级别及以上日志信息
                 -i : 输出 Info 级别及以上日志信息
                 -d : 输出 Debug 级别及以上日志信息
+
     目录结构
-        .gradle : Gradle 运行时 Task 底层支持与依赖环境项存储位置
+        .gradle: Gradle 运行时 Task 底层支持与依赖环境项存储位置
+        build.gradle: Gradle 项目描述信息 描述项目如何构建等一系列信息 (build.gradle会在每个模块下都有一个)
+        gradlew: Gradle 环境脚本用于执行 Gradle 命令 (Linux) ./gradlew build 执行构建命令
+        gradlew.bat: (Windows)
+        settings.gradle: 包含项目必要设置项 任务与项目依赖关系 (一个项目无论有多少模块它只会有一个settings配置实例对象)
+        wrapper: Gradle 安装环境
