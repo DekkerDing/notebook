@@ -1,0 +1,14 @@
+Gradle 对象
+    Project
+        Gradle = project 1~N (类似 pom.xml 或 jar)
+    Task
+        Gradle = 最小可执行单位 如 编译 打包 ..
+        Project(Task ...)
+        每一个 Task 都是 org.gradle.api.DefaultTask 类型
+        执行任务
+            命令 ： gradle -q 任务名称
+                -q : 输出 Quiet 级别及以上日志信息
+                -i : 输出 Info 级别及以上日志信息
+                -d : 输出 Debug 级别及以上日志信息
+    目录结构
+        .gradle : Gradle 运行时 Task 底层支持与依赖环境项存储位置
