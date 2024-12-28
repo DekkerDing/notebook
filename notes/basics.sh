@@ -349,3 +349,5 @@ sudo systemctl set-default graphical.target
 
 #语言 (桌面端)
 sudo apt install -y fcitx
+sudo apt install libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2sudo
+sudo apt install libgsettings-qt1
