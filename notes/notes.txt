@@ -185,7 +185,18 @@ Gradle 对象
 
         插件：
             脚本插件：
+                apply from
             二进制插件：
+                buildscript:
+
+                apply:
+
+                apply plugin:
+
+                plugins:
+
+        生命周期：
+
     Task
         Gradle = 最小可执行单位 如 编译 打包 ..
         Project(Task ...)
@@ -212,7 +223,6 @@ Gradle 对象
         动作
             @TaskAction
             @Input
-
 
     目录结构
         .gradle: Gradle 运行时 Task 底层支持与依赖环境项存储位置
