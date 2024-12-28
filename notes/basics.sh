@@ -346,3 +346,6 @@ sudo systemctl restart systemd-logind.service
 #恢复自动休眠功能
 sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
 sudo systemctl set-default graphical.target
+
+#语言 (桌面端)
+sudo apt install -y fcitx
