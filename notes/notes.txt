@@ -106,11 +106,11 @@ Gradle 对象
                 publishing：
 
                 configurations：
-
+                    简单一句话概括configurations0的作用：将本项目需要的相关依赖资源进行分组 A组你可以提供在运行时使用 B 组你提供在测试运行时使用 C组编译时使用
                 sourceSets：
 
                 artifacts：
-
+                    意思是产品、产物，可以理解为一个可以交付的jar或者war定义好产物构建规则然后结合archives或publishing发布到私服或中央仓库
 
                 uri：
                     将文件路径解析为URI，相对于该项目的项目目录
@@ -158,10 +158,19 @@ Gradle 对象
                     通过闭包配置对象集合
 
                 dependencies：
-                    implementation 项目运行时所需要的依赖
+                    api
+                    compileOnlyApi
+                    apiElements
+                    implementation 项目运行时所需要的依赖 (依赖不会传递)
                     testImplementation 在测试时所需要的依赖
+                    compileOnly 编译时使用
+                    runtimeOnly 运行时使用
+                    compileClasspath
+                    runtimeElements
+                    runtimeClasspath
                     testRuntimeOnly
                     classpath
+                    annotationProcessor
             作用域:
                 1. Project 对象自身
 
@@ -186,6 +195,10 @@ Gradle 对象
                 -q : 输出 Quiet 级别及以上日志信息
                 -i : 输出 Info 级别及以上日志信息
                 -d : 输出 Debug 级别及以上日志信息
+        加载 TaskContainer
+            tasks.create 直接声明注册
+            tasks.register 懒加载的方式去注册task
+            tasks.with 匿名任务
 
     目录结构
         .gradle: Gradle 运行时 Task 底层支持与依赖环境项存储位置
