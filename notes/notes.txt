@@ -158,19 +158,21 @@ Gradle 对象
                     通过闭包配置对象集合
 
                 dependencies：
-                    api
-                    compileOnlyApi
-                    apiElements
+                    api 与implementation类似但它会暴露依赖项给项目的所有模块
+                    compileOnlyApi 编译时需要运行时不需要但会暴露给其他模块
+                    apiElements 允许其他项目依赖于这些 API 元素而无需了解其实现细节 向其他项目公开库的 API 元素
                     implementation 项目运行时所需要的依赖 (依赖不会传递)
                     testImplementation 在测试时所需要的依赖
-                    compileOnly 编译时使用
-                    runtimeOnly 运行时使用
-                    compileClasspath
-                    runtimeElements
-                    runtimeClasspath
-                    testRuntimeOnly
-                    classpath
-                    annotationProcessor
+                    compileOnly 编译时使用 用于指定编译时依赖但不会在运行时包含在最终构建结果中 编译时所需但从最终工件中排除的依赖项
+                    runtimeOnly 运行时使用 在编译时我不参与优化编译速度(明确指定) 仅在运行时使用不用于编译
+                    compileClasspath 在编译阶段使用以解析库中的类和方法如果某个依赖项未包含在此路径中则代码将无法编译即使该依赖项在运行时可用 	编译源代码所需的依赖项
+                    runtimeElements 用于向消费者公开运行时依赖项使他们在执行应用程序时能够访问这些元素 供消费者在运行时使用的工件
+                    runtimeClasspath 确保所有必需的库在运行时可用如果某个库在 compileClasspath 中但不在 runtimeClasspath 中则应用程序在执行时可能会遇到错误 	运行应用程序所需的依赖项
+                    testRuntimeOnly 通过确保测试特定库（如测试框架）不会影响生产构建帮助保持主应用程序的轻量化 仅在测试期间需要的依赖项
+                    classpath 依赖仅在构建时生效不会被项目的主类路径 为构建脚本引入依赖比如 Gradle 插件 工具库等
+                    annotationProcessor 用于添加Java注解处理器依赖项
+                    androidTestImplementation：用于添加Android测试时需要的依赖项
+                    kapt：用于添加Kotlin注解处理器依赖项
             作用域:
                 1. Project 对象自身
 
@@ -224,10 +226,39 @@ Gradle 对象
             @TaskAction
             @Input
 
+        test
+            include 可以把哪些package包含进来
+            exclude 排除单元测试时不需要执行的package
+            systemProperty 'xxx'，'xxx' 传入特定参数
+            jvmArgs
+            minHeapSize
+            maxHeapSize
+
+        Gradle 命令
+            gradle buile 构建
+                gradle buile -x test 跳过测试
+            gradle test 执行测试用例
+            gradle --status 查看当前守护进程状态
+            gradle --no-daemon 禁止守护进程
+            gradle task 查看任务
+            gradle classes 编译 class文件
+                gradle classes -q 编译 class文件 安静模式 只执行不打印日志
+    钩子函数
+        有些时候我们希望在Gradle的整个生命周期中的不同时段执行一些操作，我们可以使用官方提供的生命周期钩子函数
+            gradle.settingsEvaluated() 完成项目的配置阶段之后调用（只能定义在setting.gradle或init.gradle脚本中）
+            gradle.projectsLoaded（）所有项目加载之后调用（只能定义在setting.gradle或init.gradle脚本中）
+            gradle.beforeProject(）每个项目完成配置之前调用（只能定义在 setting.gradle或init.gradle脚本中）
+            gradle.afterProject() 每个项目完成配置之后调用
+            gradle.projectEvaluated() 所有项目全部完成配置之后调用
+            gradle.afterEvaluate（）整个配置阶段完成后调用
+            gradle.taskGraph.whenReady 全部任务图已经构建完成可以就绪后调用
+            gradle.taskGraph.beforeTask 执行每一个任务之前调用
+            gradle.taskGraph.afterTask 每一个任务执行完成之后调用
+            gradle.buildFinished 整个构建全部结束后调用
     目录结构
         .gradle: Gradle 运行时 Task 底层支持与依赖环境项存储位置
         build.gradle: Gradle 项目描述信息 描述项目如何构建等一系列信息 (build.gradle会在每个模块下都有一个)
         gradlew: Gradle 环境脚本用于执行 Gradle 命令 (Linux) ./gradlew build 执行构建命令
         gradlew.bat: (Windows)
         settings.gradle: 包含项目必要设置项 任务与项目依赖关系 (一个项目无论有多少模块它只会有一个settings配置实例对象)
-        wrapper: Gradle 安装环境
+        wrapper: Gradle 不同版本的环境
