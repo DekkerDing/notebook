@@ -237,12 +237,14 @@ Gradle 对象
         Gradle 命令
             gradle buile 构建
                 gradle buile -x test 跳过测试
+                gradle build --stacktrace --info Gradle 调试模式
             gradle test 执行测试用例
             gradle --status 查看当前守护进程状态
             gradle --no-daemon 禁止守护进程
             gradle task 查看任务
             gradle classes 编译 class文件
                 gradle classes -q 编译 class文件 安静模式 只执行不打印日志
+
     钩子函数
         有些时候我们希望在Gradle的整个生命周期中的不同时段执行一些操作，我们可以使用官方提供的生命周期钩子函数
             gradle.settingsEvaluated() 完成项目的配置阶段之后调用（只能定义在setting.gradle或init.gradle脚本中）
