@@ -238,6 +238,7 @@ Gradle 对象
             gradle buile 构建
                 gradle buile -x test 跳过测试
                 gradle build --stacktrace --info Gradle 调试模式
+                gradle clean build --refresh-dependencies 清理缓存并重试
             gradle test 执行测试用例
             gradle --status 查看当前守护进程状态
             gradle --no-daemon 禁止守护进程
