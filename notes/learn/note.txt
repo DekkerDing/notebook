@@ -3,3 +3,18 @@
 中文站点：http://camunda-cn.shaochenfeng.com/
 下载：https://downloads.camunda.cloud/release/camunda-bpm/run/7.15/
 案例地址：Congratulation!|docs.camunda.org
+
+
+ProcessEngine
+
+任务分配
+    固定值：
+    值表达式：
+    方法表达式：
+    监听器：
+
+流程变量
+    运行时变量
+    历史变量
+
+候选人/候选人组
