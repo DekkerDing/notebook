@@ -196,6 +196,7 @@ network:
 
 sudo netplan apply
 sudo systemctl restart networking
+chmod 0600 01-network-manager-all.yaml
 
 #设置history记录全部操作记录
 # vim /etc/bash.bashrc #将下面这段内容添加到，并执行bash即可
