@@ -351,3 +351,29 @@ sudo systemctl set-default graphical.target
 sudo apt install -y fcitx
 sudo apt install libqt5qml5 libqt5quick5 libqt5quickwidgets5 qml-module-qtquick2sudo
 sudo apt install libgsettings-qt1
+
+#扫描检查系统中无线网卡
+lshw -C network
+#查看详细信息
+iwconfig
+
+#安装驱动
+sudo apt update
+sudo apt install firmware-b43-installer
+sudo apt install linux-firmware
+
+#查看网卡驱动
+iwconfig
+
+# 扫描周围的 Wi-Fi 网络
+nmcli dev wifi list
+
+# 查看网络链接状态
+nmcli con show --active
+
+#重启无线网卡
+sudo nmcli radio wifi off
+sudo nmcli radio wifi on
+
+#手动扫描 Wifi 信息
+nmcli dev wifi rescan
