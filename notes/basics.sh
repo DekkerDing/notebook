@@ -378,3 +378,14 @@ sudo nmcli radio wifi on
 
 #手动扫描 Wifi 信息
 nmcli dev wifi rescan
+
+#添加输入法 https://blog.csdn.net/Aimonii/article/details/141260938
+#安装框架
+sudo apt install ibus
+#切换框架
+im-config -s ibus
+#由于Ubuntu Desktop 20.04使用的是GNOME桌面，所以需要安装相应的平台支持包
+sudo apt install ibus-gtk ibus-gtk3
+#选择简体拼音输入法，完成安装
+sudo apt install ibus-pinyin
+#完成安装后，将中文输入法添加到输入源选项中
