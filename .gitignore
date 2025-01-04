@@ -10,3 +10,5 @@
 /.idea/notebook.iml
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.idea/gradle.xml
+/.idea/kotlinc.xml
