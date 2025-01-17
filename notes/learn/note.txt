@@ -1,0 +1,9 @@
+case 1:
+    // 1. 参数校验判断
+        定义 参赛校验接口 PapersValidateInterface
+            实现 如 金额校验
+                1. Money class
+                2. @Component 注入 Spring 容器
+                3. 实现校验管理器 Manager
+                3.1 获取 Spring 所有  PapersValidateInterface 实现 Bean 映射成 Map 对象
+                3.2 循环 遍历进行条件校验过滤
