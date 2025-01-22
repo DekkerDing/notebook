@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <p>{{ data }}</p>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
@@ -35,11 +36,19 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  data() {
+    return{
+      data: 'Data To Hello World'
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+
+// scoped 局部样式
+
 <style scoped>
 h3 {
   margin: 40px 0 0;
