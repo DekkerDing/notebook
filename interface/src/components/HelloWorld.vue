@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import Parent  from "@/components/parent/Parent.vue";
 export default {
   name: 'HelloWorld',
   props: {
@@ -41,6 +42,9 @@ export default {
     return{
       data: 'Data To Hello World'
     }
+  },
+  comments:{
+    Parent
   }
 }
 </script>

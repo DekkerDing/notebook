@@ -6,3 +6,14 @@
 
 计算属性
     基于现有的数据计算出来的新属性依赖的数据变化自动重新计算。
+
+
+组件通讯
+    父子关系
+        props
+        $emit
+    非父子关系
+        provide
+        inject
+        eventbus
+    Vuex
