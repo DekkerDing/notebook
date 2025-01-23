@@ -1,6 +1,8 @@
 package io.github.dekkerding.examples.factory;
 
-import io.github.dekkerding.examples.service.Car;
+
+import io.github.dekkerding.examples.service.Engine;
+import io.github.dekkerding.examples.service.Tyre;
 
 /**
  * 抽象工厂
@@ -8,8 +10,14 @@ import io.github.dekkerding.examples.service.Car;
 public interface Factory {
 
     /**
-     *  产生汽车
+     *  产生发动机
      * @return
      */
-    public Car createCar();
+    public Engine createEngine();
+
+    /**
+     * 产生轮胎
+     * @return
+     */
+    public Tyre createTyre();
 }

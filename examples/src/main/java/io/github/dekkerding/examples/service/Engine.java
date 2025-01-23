@@ -3,10 +3,10 @@ package io.github.dekkerding.examples.service;
 /**
  * 抽象产品
  */
-public interface Car {
+public interface Engine {
 
     /**
-     * 产品行为
+     * 引擎调节
      */
-    void run();
+    void adjust();
 }
