@@ -1,0 +1,314 @@
+索引：
+    创建索引
+        PUT /es_index
+    查询索引
+        GET /es_index
+        返回响应：
+            别名 “aliases”： {}
+            映射 “mappings”： {}
+            settings {} 属性:
+                索引名称 "provided_name": ""
+                分片 "number_of_shards": ""
+                副本 "numberofreplicas": ""
+                uuid "uuid": ""
+                版本 "version": {}
+                分词器：
+                    "index"：{
+                        "analysis.analyzer.default.type"： "ik_max_word"
+                    }
+    索引是否存在
+        HEAD /es_index
+    删除索引
+        DELETE /es_index
+    关闭索引
+        POST /es_index/close
+    打开索引
+        POST /es_index/_open
+    重建索引
+        POST _reindex
+
+文档：
+    添加文档：
+        指定 ID：
+            PUT /es_index/_doc/1
+        自生成ID：
+            POST /es_index/_doc
+        共同点： 底层是先做删除后更新 形成一种覆盖的形式
+        基于文档ID判断后添加 (保证文档唯一性)：
+            PUT /es_index/create/1
+            POST /es_index/create/1
+        批量添加：
+            创建 底层要基于文档ID校验： (如果文档存在则抛出异常)
+                POST _bulk
+                {
+                    "create": {
+                        "_index": "xxx对应索引",
+                        "_type": "_doc",
+                        "_id": xxx
+                    }
+                }
+                {
+                    "id":xxx,
+                    添加数据....
+                }
+            创建 如文档存在覆盖原来文档：
+                POST _bulk
+                {
+                    "index": {
+                        "_index": "xxx对应索引",
+                        "_type": "_doc",
+                        "_id": xxx
+                    }
+                }
+                {
+                    "id":xxx,
+                    添加数据....
+                }
+
+    更新文档：
+        指定 ID：
+            POST /es_index/_update/1
+        基于查询条件更新： (类似于 Mysql Update xxx where xxx=xx )
+            POST /es_index/_update_by_query
+            {
+                "query": {
+                    "match":{
+                        "_id": xx
+                    }
+                },
+                "script": {
+                    "source": "ctx._source.age = 30"
+                }
+            }
+
+    查询文档：
+            全文挡查询：
+                GET /es_index/_search
+            基于ID查询：
+                GET /es_index/_doc/1
+            精确查询 (如不进行分词)：
+                GET /es_index/_search
+                {
+                    "query":{
+                        "term": {
+                            "FIELD": {
+                                "value": "xxx"
+                            }
+                        }
+                    }
+                }
+
+            条件查询 or
+                GET /es_index/_search
+                {
+                    "query":{
+                        "match": {
+                            "xxx字段": "xxx"
+                        }
+                    }
+                }
+
+            条件查询 and
+                GET /es_index/_search
+                {
+                    "query":{
+                        "match": {
+                            "xxx字段": {
+                                "query":  "xxx字段值",
+                                "operator": "and"
+                            }
+                        }
+                    }
+                }
+
+            查询条件 至少匹配(几个)
+                GET /es_index/_search
+                {
+                    "query":{
+                        "match": {
+                            "xxx字段": {
+                                "query": "xxx字段值",
+                                "minimum_should_match": 2 至少匹配几个
+                            }
+                        }
+                    }
+                }
+
+            短语匹配 (对比 AND 更加精确 要求查询的分词与结果是连续的)：
+                GET /es_index/_search
+                {
+                    "query":{
+                        "match_phrase": {
+                            "xxx字段": {
+                                "query": "xxx字段值" # 要求查询的分词与结果是连续的 (查询条件是什么查询结果就是什么)
+                                "slop": 2 # 指定中间可以隔多少个字符
+                            }
+                        }
+                    }
+                }
+
+            多条件字段查询:
+                GET /es_index/_search
+                {
+                    "query":{
+                        "multi_match": {
+                            "query": "xxx字段值",
+                            "fields": [
+                                "xxx条件字段",
+                                "xxx条件字段"
+                                ...
+                            ]
+                        }
+                    }
+                }
+
+            指定拼接查询条件查询 query_string:
+                允许我们在单个查询字符串中指定AND丨OR丨NOT条件同时也和multi_matchquery一样支持多字段搜索。
+                和match类似但是 match需要指定字段名query_string是在所有字段中搜索范围更广泛。
+                注意：查询字段分词就将查询条件分词查询查询字段不分词将查询条件不分词查询
+
+                指定单个查询字段范围：
+                    GET /es_index/_search
+                    {
+                        "query":{
+                            "query_string": {
+                                "default_field": "xxx字段" #指定字段查询范围 只搜索这个字段匹配的
+                                "query": "xxx字段值 AND xxx字段值"
+                            }
+                        }
+                    }
+                指定多个查询字段范围：
+                    GET /es_index/_search
+                    {
+                        "query":{
+                            "query_string": {
+                                "fields": [
+                                "xxx字段", #指定字段查询范围 只搜索这个字段匹配的
+                                "xxx字段"
+                                ...
+                                ]
+                                "query": "xxx字段值 AND xxx字段值"
+                            }
+                        }
+                    }
+
+            精确查询 term
+                查询字段映射类型为keyword
+                GET /es_index/_search
+                {
+                    "query":{
+                        "term": {
+                            "xxx字段.keyword": {
+                                "value": "xxx字段值"
+                            }
+                        }
+                    }
+                }
+
+
+            批量查询：
+                基于ID与不同索引查询：
+                    GET _mget
+                    {
+                        "docs":[
+                            {
+                                "_index": "索引名称",
+                                "_id": xxx
+                            }
+                            ...
+                        ]
+                    }
+
+                基于多条件与不同索引查询：
+                    GET /_msearch
+                    {
+                        "index": "xxx"
+                    }
+                    {
+                        "query": {
+                            "match_all": {}
+                        },
+                        "size": xxx,
+                        "from": 0
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            分页查询:
+                10000以内:
+                    GET /es_index/_search
+                    {
+                        "query":{
+                            "match_all": {},
+                            "size": xxx,
+                            "from": 0
+                        }
+                    }
+                设置修改条数限制：
+                    PUT /es_index/_settings
+                    {
+                        "index.max_result_window":"20000"
+                    }
+                快照 Scroll：
+                    查询命令中新增scro11=1m说明采用游标查询保持游标查询窗口一分钟。
+                    这里由于测试数据量不够所以size值设置为2
+                    实际使用中为了减少游标查询的次数可以将值适当增大比如设置为1000
+                    GET /es_index/_search?scroll=1m
+                    {
+                        "query": {
+                            "match_all": {}
+                        },
+                        "size": xxx
+                    }
+
+                    scroll_id的值就是上一个请求中返回的_scroll_id的值
+                    GET/_search/scroll
+                    {
+                        "scroll": "1m",
+                        "scroll_id": "xxxx"
+                    }
+                排序：
+                    GET /es_index/_search
+                    {
+                        "query":{
+                            "match_all": {},
+                            "sort": [
+                                {
+                                    "字段名称": "desc"
+                                }
+                            ]
+                        }
+                    }
+                指定返回值:
+                    GET /es_index/_search
+                    {
+                        "query":{
+                            "match_all": {},
+                            "_source": [
+                                "字段名称",
+                                ...
+                            ]
+                        }
+                    }
+    分词器：
+        POST _analyze
+        {
+            "analyzer": "ik_max_word",
+            "text": "值"
+        }
+    删除文档：
+        基于ID删除:
+            DELETE /es_index/_doc/1
