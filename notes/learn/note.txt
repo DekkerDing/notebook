@@ -10,8 +10,10 @@
                 索引名称 "provided_name": ""
                 分片 "number_of_shards": ""
                     将一个物理大索引拆分成若干个小索引每一个小索引称为一个Shard
-                    Index是逻辑概念，底层是若干个Shards，分布在若干节点上
+                    Index是逻辑概念，底层是若干个Shards 分布在若干节点上
                     个Shard最多可存放20亿个文档
+                    路由算法（索引和查询）
+                    shard number = hash(document id) % number_of_primary_shards
                     查看:
                         GET /_cat/indices?v
                     设置参考
@@ -47,6 +49,25 @@
                     "index"：{
                         "analysis.analyzer.default.type"： "ik_max_word"
                     }
+    索引刷新 refresh
+        refresh=true（或refresh）立即refresh文档可立即查询到
+        refresh=wait_for 阻塞client直到设置的refresh-interval
+
+        PUT es_index/_doc/1?refresh
+        PUT es_index/_doc/1?refresh=true
+        PUT es_index/_doc/1?refresh=false
+        PUT es_index/_doc/1?refresh=wait_for
+
+        PUT /es_index/_settings
+        {
+            "index": {
+                "refresh_interval": "15s"
+            }
+        }
+
+    re-indexing 索引重建
+
+
     索引是否存在
         HEAD /es_index
     删除索引
@@ -57,6 +78,8 @@
         POST /es_index/_open
     重建索引
         POST _reindex
+    查看索引
+        GET /es_index/_settings
 
 文档：
     添加文档：
@@ -97,9 +120,19 @@
                 }
 
     更新文档：
+
         指定 ID：
             POST /es_index/_update/1
+            {
+                "doc": {
+                    更新文档的数据....
+                },
+                "doc_as_upsert": true # 如果该文档不存在则创建反之更新文档
+            }
+
         基于查询条件更新： (类似于 Mysql Update xxx where xxx=xx )
+            1 存储生成快照 -> 2 Search Query Replication Group -> 3 Bulk Update
+            基于乐观锁概念 比较并判断 version_conflicts 字段 (是否有版本冲突)
             POST /es_index/_update_by_query
             {
                 "query": {
@@ -109,8 +142,19 @@
                 },
                 "script": {
                     "source": "ctx._source.age = 30"
+                },
+                "conflicts": "proceed" # 当遇到快照冲突后续如何操作 proceed 继续执行  中止执行
+            }
+
+        upsert 更新:
+            POST /es_index/_update/1
+            {
+                "upsert": {
+                    更新数据....
                 }
             }
+
+
 
     查询文档：
             全文挡查询：
@@ -241,6 +285,10 @@
                             ]
                         }
                     }
+                    只看 source 字段里内容：
+                        GET /es_index/_source/1
+                    只看 元数据 内容:
+                        GET /es_index/_doc/1?_source=false
 
             term：
             不分词 不算分
@@ -382,7 +430,7 @@
                     }
 
                 错误模糊冗余搜索 fuzzy
-                    GET /es_index/_search
+                    GET /es_index/_search -XP0ST http://localhost:9200/_bulk --data-binary "@bulk_data.json.txt"
                     {
                         "query":{
                             "fuzzy": {
@@ -413,6 +461,7 @@
                     }
 
             批量查询：
+            curl -H "Content-Type: application/x-ndjson"
                 基于ID与不同索引查询：
                     GET _mget
                     {
@@ -518,6 +567,13 @@
     删除文档：
         基于ID删除:
             DELETE /es_index/_doc/1
+        基于查询删除:
+            POST es_index/_delete_by_query
+            {
+                "query": {
+                    查询匹配条件
+                }
+            }
 
 
 别名:
@@ -544,3 +600,38 @@
 索引模板：
     使用 索引创建设置组件化 基于索引模板前缀匹配,实现复用通用 索引 的 settings mappings
     索引模版只适用于新创建的索引
+
+Mapping 映射
+    查看:
+        GET /es_index/_mapping
+    显示设置
+        PUT es_index
+        {
+            "mappings": {
+                "properties": {
+                    "xxx字段"： {
+                        "type": "constant_keyword",
+                        "value": "xxx字段值"
+                    }
+                }
+            }
+        }
+
+    类型
+        boolean
+        float 小数点
+        date "format" : "yyyy/MM/dd HH:mm:ss yyyy/MM/dd epoch_millis"
+        long 表示数值
+        integer 表示数值
+        double 表示浮点数
+        binary
+        nested 表示一个对象数组
+        Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序
+            constant_keyword
+            wildcard
+        text 表示文本信息 字符串值 无结构数据
+            search_as_you_type
+            match_only_text
+            completion
+            token_count
+            etc
