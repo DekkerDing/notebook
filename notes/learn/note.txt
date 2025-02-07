@@ -9,11 +9,38 @@
             settings {} 属性:
                 索引名称 "provided_name": ""
                 分片 "number_of_shards": ""
+                    将一个物理大索引拆分成若干个小索引每一个小索引称为一个Shard
+                    Index是逻辑概念，底层是若干个Shards，分布在若干节点上
+                    个Shard最多可存放20亿个文档
                     查看:
                         GET /_cat/indices?v
                     设置参考
+                        视情况定：节点数量 每个节点的容量 索引数量/大小 查询模式
+                        业界推荐单个shard<=50GB
+                        Github实践128个shards，每个120GB
+                        作者推荐25G～40GB（考虑堆内存需求）
+                        500GB数据->10~20个Shards
+                        推荐每GB堆内存支持最多20个Shards
+                        设置jvm.options（Xms/Xmx），ES缺省1GB
+                        3 Shards+3Replicas/Shard，每个Shard50GB
+                        Shards存储需求3x50GB=150GB
+                        Replicas存储需求3x3x50GB=450GB
+
                 副本 "numberofreplicas": ""
+                    副本是分片的完全拷贝 也称replica shards
+                    被复制的源Shard称为PrimaryShard
+                    Primary Shard + Replica Shards统称Replication Group
+                    查看
+                        GET / cat/shards?v
+                        GET / cluster/health
                     设置参考
+                        关键业务：
+                            2+
+                        非关键业务：
+                            1
+                        auto_expand_replicas
+                    快照：
+                        快照用于对某个索引或者对整个集群进行备份
                 uuid "uuid": ""
                 版本 "version": {}
                 分词器：
