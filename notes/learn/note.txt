@@ -27,6 +27,10 @@
                         3 Shards+3Replicas/Shard，每个Shard50GB
                         Shards存储需求3x50GB=150GB
                         Replicas存储需求3x3x50GB=450GB
+                        日志类应用 单个分片不要大于50GB
+                        搜索类应用 单个分片不要超过20GB
+                    按需将索引的分片分配到特定的节点：
+
 
                 副本 "numberofreplicas": ""
                     副本是分片的完全拷贝 也称replica shards
@@ -36,6 +40,10 @@
                         GET / cat/shards?v
                         GET / cluster/health
                     设置参考
+                        副本是主分片的拷贝
+                        副本会降低数据的索引速度：有几份副本就会有几倍的CPU资源消耗在索引I上
+                        会减缓对主分片的查询压力 但是会消耗同样的内存资源
+                        如果机器资源充分 提高副本数 可以提高整体的查询QPS
                         关键业务：
                             2+
                         非关键业务：
@@ -45,10 +53,20 @@
                         快照用于对某个索引或者对整个集群进行备份
                 uuid "uuid": ""
                 版本 "version": {}
+
+                creation_date: "时间戳"
                 分词器：
                     "index"：{
                         "analysis.analyzer.default.type"： "ik_max_word"
                     }
+                    内置：
+                        Standard Analyzer 一默认分词器 按词切分 小写处理
+                        Simple Analyzer －按照非字母切分（符号被过滤） 小写处理
+                        Stop Analyzer －小写处理 停用词过滤 (the, a, is)
+                        Whitespace Analyzer 一按照空格切分 不转小写
+                        Keyword Analyzer －不分词 直接将输入当作输出
+                        Patter Analyzer 一正则表达式 默认\W+(非字符分隔）
+                        Customer Analyzer 自定义分词器
     索引刷新 refresh
         refresh=true（或refresh）立即refresh文档可立即查询到
         refresh=wait_for 阻塞client直到设置的refresh-interval
@@ -65,9 +83,19 @@
             }
         }
 
+    Shard allocation awareness:
+
+    Force awareness：
+
+
     re-indexing 索引重建
-
-
+        索引的Mappings发生变更：字段类型更改 分词器及字典更新
+        索引的Settings发生变更：索引的主分片数发生改变
+        集群内 集群间需要做数据迁移
+        Update By Query: 在现有索引上重建
+        Reindex：在其他索引上重建索引
+    查看 Node 详情
+        GET _cat/nodes
     索引是否存在
         HEAD /es_index
     删除索引
@@ -80,8 +108,21 @@
         POST _reindex
     查看索引
         GET /es_index/_settings
+    显示索引状态为 green 的索引
+        GET /_cat/indices?v&health=green
+    按照文档个数排序
+        GET /_cat/indices?v&s=docs.count:desc
+    查看每个索引占用的内存信息
+        GET /_cat/indices?v&h=i,tm&s=tm:desc
 
 文档：
+    元数据:
+        "_index" 文档所属的索引名
+        "_type" 文档所属的类型名
+        "_id" 文档唯一ID
+        "_source" 文档的原始JSON数据
+        "_version" 文档的版本信息
+        "_score" 相关性打分
     添加文档：
         指定 ID：
             PUT /es_index/_doc/1
@@ -157,6 +198,10 @@
 
 
     查询文档：
+            Response 响应：
+                took： 花费时间
+                total: 符合条件的总文档数
+                hits： 结果集
             全文挡查询：
                 GET /es_index/_search
             基于ID查询：
@@ -234,7 +279,7 @@
                                 注意：查询字段分词就将查询条件分词查询查询字段不分词将查询条件不分词查询
 
                                 指定单个查询字段范围：
-                                    GET /es_index/_search
+                                    POST /es_index/_search
                                     {
                                         "query":{
                                             "query_string": {
@@ -244,7 +289,7 @@
                                         }
                                     }
                 指定多个查询字段范围：
-                    GET /es_index/_search
+                    POST /es_index/_search
                     {
                         "query":{
                             "query_string": {
@@ -259,7 +304,7 @@
                     }
 
                 简化 指定多个查询字段范围：
-                    GET /es_index/_search
+                    POST /es_index/_search
                     {
                         "query":{
                             "simple_query_string": {
@@ -384,6 +429,7 @@
                         }
 
                     基于 constant_score：
+                        通过constantscore转成filtering 没有算分
                         GET /es_index/_search
                         {
                             "query":{
@@ -540,11 +586,26 @@
                     }
 
                     scroll_id的值就是上一个请求中返回的_scroll_id的值
-                    GET/_search/scroll
+                    GET /_search/scroll
                     {
                         "scroll": "1m",
                         "scroll_id": "xxxx"
                     }
+                search_after
+                第一步搜索需要指定 sort 并且保证值是唯一的(可以通过加入 id 保证唯一性)
+                然后使用上一次 最后一个文档的 sort值进行查询
+                GET /es_index/_search
+                {
+                    "size": 1,
+                    "query": {
+                        "match_all": {}
+                    },
+                    "search_after":[13,"上一次随机ID"],
+                    "sort": [
+                        {"_id","asc"}
+                    ]
+
+                }
                 排序：
                     GET /es_index/_search
                     {
@@ -564,6 +625,19 @@
             "analyzer": "ik_max_word",
             "text": "值"
         }
+
+        GET /_analyze
+        {
+            "analyzer": "分词器",
+            "text": "要分词的文本"
+        }
+
+        POST _analyze
+        {
+            "field": "指定的字段",
+            "analyzer": "ik_max_word",
+            "text": "值"
+        }
     删除文档：
         基于ID删除:
             DELETE /es_index/_doc/1
@@ -574,6 +648,7 @@
                     查询匹配条件
                 }
             }
+    跨集群搜索:
 
 
 别名:
@@ -601,6 +676,8 @@
     使用 索引创建设置组件化 基于索引模板前缀匹配,实现复用通用 索引 的 settings mappings
     索引模版只适用于新创建的索引
 
+
+
 Mapping 映射
     查看:
         GET /es_index/_mapping
@@ -616,6 +693,56 @@ Mapping 映射
                 }
             }
         }
+        PUT es_index
+        {
+            "mappings": {
+                "properties": {
+                    "xxx字段"： {
+                        "type": "字段类型"
+                        "index": false # Index－控制当前字段是否被索引 默认为true 如果设置成 false 该字段不可被搜索
+                    }
+                }
+            }
+        }
+        index_options:
+            四种不同级别的IndexOptions配置 可以控制倒排索引l记录的内容 记录内容越多 占用存储空间越大
+            docs － 记录 doc id
+            freqs － 记录 doc id 和 term frequencies
+            positions - 记录 doc id / term frequencies / term position
+            offsets - doc id / term frequencies / term posistion / character offects
+            Text 类型默认记录postions，其他默认为docs
+        需要对Null值实现搜索:
+            只有Keyword类型支持设定Null_Value
+            PUT es_index
+            {
+                "mappings": {
+                    "properties": {
+                        "xxx字段"： {
+                            "type": "Keyword"
+                            "null_value" "NULL"
+                        }
+                    }
+                }
+            }
+        copy_to:
+            copy_to将字段的数值拷贝到目标字段
+            PUT es_index
+            {
+                "mappings": {
+                    "properties": {
+                        "firstName"： {
+                            "type": "text"
+                            "copy_to" "fullName"
+                        },
+                        "lastName"： {
+                            "type": "text"
+                            "copy_to" "fullName"
+                        }
+                    }
+                }
+            }
+            效果：
+                GET users/_search?q=fullName:(Ruan Yiming)
 
     类型
         boolean
@@ -625,6 +752,7 @@ Mapping 映射
         integer 表示数值
         double 表示浮点数
         binary
+        object
         nested 表示一个对象数组
         Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序
             constant_keyword
@@ -635,3 +763,74 @@ Mapping 映射
             completion
             token_count
             etc
+        geo_point
+        geo_shape
+        percolator
+聚合分析
+    Bucket Aggregation 列满足特定条件的文档的集合
+        类似于 GROUP by
+
+    Metric Aggregation 数学运算，可以对文档字段进行统计分析
+        类属于 COUNT() 等SQL统计函数
+    Pipeline Aggregation 对其他的聚合结果进行二次聚合
+    Matrix Aggregration 支持对多个字段的操作并提供一个结果矩阵
+    sub-aggregation
+
+parent
+child
+
+优化
+    写入：
+        提高文档写入吞吐量
+        过程：
+            Refresh
+                将文档先保存在 Index buffer 中
+                以 refresh_interval 为间隔时间定期清空 buffer
+                生成 segment, 借助文件系统缓存的特性
+                先将segment 放在文件系统缓存中
+                并开放查询 以提升搜索的实时性
+            Translog
+                Segment没有写入磁盘 即便发生了当机 重启后 数据也能恢复 默认配置是每次请求都会落盘
+            Flush
+                删除l旧的 translog 文件
+                生成 Segment 并写入磁盘 /更新 commit point 并写入磁盘 ES 自动完成 可优化点不多
+        客户端
+            多线程
+            批量写
+        服务器
+            降低IO操作
+            使用ES自动生成的文档ld
+            Refresh Interval
+            降低 CPU和存储开销
+            减少不必要分词
+                只需要聚合不需要搜索 Index设置成false
+                不需要算分 Norms 设置成 false
+                不要对字符串使用默认的 dynamic mapping 字段数量过多 会对性能产生比较大的影响
+                Index_options 控制在创建倒排索引|时 哪些内容会被添加到倒排索引中 优化这些设置 一定程度可以节约 CPU
+                关闭_source 减少 IO 操作 （适合指标型数据）
+            避免不需要的doc_values
+            文档的字段尽量保证相同的顺序 可以提高文档的压缩率
+            尽可能做到写入和分片的均衡负载 实现水平扩展
+            Shard Filtering
+            Write Load Balancer
+            调整BuIk线程池和队列
+                单个buk请求体的数据量不要太大 官方建议大约5-15mb
+                写入端的bulk请求超时需要足够长 建议60s以上
+                写入端尽量将数据轮询打到不同节点
+                索引创建属于计算密集型任务
+                应该使用固定大小的线程池来配置
+                来不及处理的放入队列 线程数应该配置成 CPU 核心数 +1
+                避免过多的上下文切换
+            牺牲可靠性：将副本分片设置为0，写入完毕再调整回去
+            牺牲搜索实时性：增加RefreshInterval的时间
+            增大静态配置参数 indices.memory.index_buffer_size 默认是 10% 会导致自动触发 refresh
+            Index.translog.durability：默认是request 每个请求都落盘 设置成 async 异步写入
+            Index.translog.flush_threshod_size:默认 512 mb 可以适当调大 当 translog 超过该值 会触发 flush
+            Index.translog.sync_interval 设置为 60s 每分钟执行一次
+            牺牲搜索实时性：增加RefreshInterval的时间
+            合理设置主分片数 确保均匀分配在所有数据节点上
+            Index.routing.allocation.total_share_per_node:限定每个索引|在每个节点上可分配的主分片数
+            5个节点的集群。索引有5个主分片，1个副本，应该如何设置?
+            (5+5)/5=2
+            生产环境中要适当调大这个数字 避免有节点下线时 分片无法正常迁移
+
