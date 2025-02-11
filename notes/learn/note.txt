@@ -755,9 +755,22 @@ Mapping 映射
         object
         nested 表示一个对象数组
         Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序
+        用于id 枚举及不需要分词的文本 例如电话号码 email地址 手机号码 邮政编码 性别等
+        适用于 Filter (精确匹配） Sorting 和 Aggregations
             constant_keyword
             wildcard
         text 表示文本信息 字符串值 无结构数据
+        用于全文本字段 文本会被Analyzer分词
+        默认不支持聚合分析及排序 需要设置fielddata为true
+        默认会为文本类型设置成text 并且设置一个keyword的子字段
+        如不需要检索 排序和聚合分析 Enable设置成false
+        如不需要排序或者聚合分析功能
+        Doc_values/fielddata设置成false
+        如不需要检索 Index设置成false
+        对需要检索的字段 可以通过如下配置 设定存储粒度
+        Index_options / Norms ： 不需要归一化数据时 可以关闭
+        更新频繁 聚合查询频繁的keyword类型的字段
+        推荐将 eager alobal ordinals设置为 true
             search_as_you_type
             match_only_text
             completion
@@ -833,4 +846,25 @@ child
             5个节点的集群。索引有5个主分片，1个副本，应该如何设置?
             (5+5)/5=2
             生产环境中要适当调大这个数字 避免有节点下线时 分片无法正常迁移
+            Index Alias 无需停机 无需修改程序 即可进行修改
+Segment 段合并:
+    优化点：降低最大分段大小 避免较大的分段继续参与Merge 节省系统资源 （最终会有多个分段）
+    Index.merge.policy.segments_per_tier，默认为 10 越小需要越多的合并操作
+    Index.merge.policy.max_merged_segment,默认5 GB 操作此大小以后，就不再参与后续的合并操作
+Hot Warm Architecture
+    数据通常不会有Update操作；适用于Timebased索引l数据（生命周期管理） 同时数据量比较大的场景。
+    引入Warm节点，低配置大容量的机器存放老数据，以降低部署成本
+    Hot 节点(通常使用 SSD）：索引I有不断有新文档写入。通常使用 SSD
+    Warm 节点（通常使用 HDD）：索引|不存在新数据的写入；同时也不存在大量的数据查询
+    Shard Filtering
+        标记节点(Tagging)
+            标记一个Hot节点
+                bin/elasticsearch -E node.name=hotnode -E cluster.name=geektime -E path.data=hot_data -E node.attr.my_node_type=hot
+            标记一个warm节点
+                bin/elasticsearch -E node.name=warmnode -E cluster.name=geektime E path.data=warm_data -E node.attr.my_node_type=warm
+            GET /_cat/nodeattrs?v
+        配置索引到HotNode
+        配置索引到Warm节点
 
+时间序列的索引
+    按照时间进行划分索引 会使得管理更加简单。例如 完整删除一个索引 性能比 delete by query 好 定期关闭或者删除索引
