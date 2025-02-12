@@ -87,6 +87,13 @@
 
     Force awareness：
 
+    SegmentFiles的数量：数量愈多对查询的速度与磁碟的空间愈不好
+    Shard的数量：愈多对Indexing的速度愈好 但对查成本较高 单一Shard愈大对Cluster 的 Rebalance 的成本愈高
+    Index的大小：愈大对于查询效率愈好 以Time-based资料来看的话 影响的是资料移转到下一个段的等待时间
+    资料的新旧程度：新的资料通常使用频率较频繁 会给较好的硬体资源 较旧的资料较少使用 可配置较差的硬件资源
+    时间粒度：当资料量很大时 在观察过往的资料往往时间粒度会抓较大 且观察的结果（例如：每天的log数量 每天的总销售金额 每天每部影片各别的观看次数...等）
+    Index愈来愈多：资源总是有限，太旧的资料会面删除，可保留囊的结果
+    资料的安全性：除了存取控制要妥善的限制之外 资料的备份也是非常重要的机制
 
     re-indexing 索引重建
         索引的Mappings发生变更：字段类型更改 分词器及字典更新
@@ -943,8 +950,16 @@ Hot Warm Architecture
                 bin/elasticsearch -E node.name=warmnode -E cluster.name=geektime E path.data=warm_data -E node.attr.my_node_type=warm
             GET /_cat/nodeattrs?v
         配置索引到HotNode
+            HotPhase：新的資料大量寫入HotNodes 要快 就配置较多的Primaryshards
+            Rollover：随時間及資料量的成長 透過Rollover將Index進行rotate 產生新的Index來接新的資料 而原先的 Index會進入下一個Warm的段
         配置索引到Warm节点
-
+            WarmPhase：進入到Warmdata 的段 會進入read-only 所以會透過ForceMerge與Shrink将Segment Files數量與Shards數量進行最佳化 也可同時配合Compress進行储存空間的優化
+            ColdPhase：資料進入Codedata段 會將Index進行Freeze 以减少JVMheap的使用量 提供较高的延反應 但還是能即時使用的服務狀態
+            Delete：再更久的資料，可再確已經被備份過之後進行刪除
+        Rollup 可以 Hot,Warm,Cold 任何的Index当中把資料出 且以较大的 時間颗粒度進行總運算 將結果储存新的 Rollup Index中
+        Rollup是定時執行 同時Rollup的資料在透過_rollup_search查询時 可混搭LiveData+RollupData 結果會自動合供去除掉重覆的 也因此當舊的資料被刪除後 存在Rollup的資料一樣能提供總後的查結果
+        Cron Job + Batch => Aggregation (Date Histogram, Histogram, Terms, Metrics)
+        Experimental 目前是立的功能，因此Rollup Index不能Rollover 未來會轉成為 ILM當中的一個Action
 时间序列的索引
     按照时间进行划分索引 会使得管理更加简单。例如 完整删除一个索引 性能比 delete by query 好 定期关闭或者删除索引
 
@@ -997,3 +1012,12 @@ Hot Warm Architecture
     日期 range date
     多id查询ids
     模糊查询 fuzzy
+
+Transform
+    將資料以Pivot的方式進行分析運算將結果存在獨立的Index中
+    適合複雜的Aggregation的運算及報表的定期處理工作
+    也可以這個機制查询的總結果建立成Index 當作Ingest处理時Enrich資料的LookupDataSource
+     =>每月營銷報表、每月產品銷量分析、每日影片播放量
+
+使用SnapshotLifecycleManagement（SLM）來管理資料的備份
+    設定 定期 備份的保存時間及數量，確保備份所估用的空間不會無限增長
