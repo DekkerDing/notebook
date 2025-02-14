@@ -1,0 +1,151 @@
+生产者
+    拦截器
+        org.apache.kafka.clients.producer.Producerlnterceptor
+        Interceptor可能被运行在多个线程中 因此在具体实现时用户需要自行确保线程安全
+        指定了多个lnterceptor 则Producer将按照指定顺序调用它们 并仅仅是捕获每个lnterceptor可能抛出的异常记录到错误日志中而非在向上传递
+    序列化器
+        key
+            key序列化器 org.apache.kafka.common.serialization.Serializer
+        value org.apache.kafka.common.serialization.Serializer
+            value序列化器
+    分区器
+        如果在记录中指定了分区，则使用指定的分区
+        如果没有指定分区，但是有key的值，则使用key值的散列值计算分区
+        如果没有指定分区也没有key的值，则使用轮询的方式选择一个分区
+        org.apache.kafka.clients.producer.Partitioner
+    缓冲区
+
+    流程
+        主线程 -> 生产的消息 -> [ 拦截器 序列化器 分区器 ] -> 消息累加器 -> Sender线程 -> 创建Request -> 封装并缓存为 (node信息+要发送的消息数据请求信息) -> 基于 NIO Selector发生
+        生产者消息记录 -> send() 函数 -> [ 拦截器 序列化器 分区器 ] -> 缓冲区 -> 达到batch.size 或到达linger.ms -> Brokers(基于分区策略到达分区) -> 分区 -> 给生产者 ACK 响应 -> 重试 -> 缓冲区
+
+    ack
+        0
+            生产者不确认消息是否发送成功 只要把他放入socket缓冲区就认为消息已经发送
+        1
+            生产者发送消息后 只要到了leader就认为消息已经发送成功
+        -1
+            生产者发送消息后 不仅到了leader 并且 leader还同步给了其他follower才算是同步
+            isr
+                isr指的是与leader数据同步的follower分区
+            osr
+                osr指的是与leader数据不那么同步 或者说复制进度落下的follower分区
+    消息收集器
+        消息收集器RecoderAccumulator为每个分区都维护了一个 Deque<ProducerBatch>类型的双端队列
+        ProducerBatch
+            ProducerBatch可以理解为ProducerRecord的集合
+        由于生产者客户端使用java.io.ByteBuffer在发送消息之前进行消息保存，并维护了一个BufferPool实现ByteBuffer的复用；
+        该缓存池只针对特定大小（batch.size指定）的ByteBuffer进行管理，如果消息过大的缓存，不能做到重复利用。
+        每进入一个ProducerRecord都会寻找自己的ProducerBatch
+        如果能写入则写入已自己的ProducerBatch
+        如果不能写入那就新建一个ProducerBatch
+
+
+    压缩格式
+        none
+        gzip
+        snappy
+        lz4
+
+    retries 该值为一个大于1的值指的是发送消息失败后重新发送消息的次数但重试可能导致消息乱序
+        retry.backoff.ms 每次重试之间等待的时间
+
+    request.timeout.ms 客户端等待响应的最大时长 如果超时 就会重新发送，除非达到重试次数
+    该设置应该比replica.lag.time.max.ms大 以免服务器延迟时间内重试
+
+    batch.size 批量发送的数据量
+
+    send.buffer.bytes 利用TCP发送数据的时候使用的缓冲区
+
+    connections.max.idle.ms 当连接空闲时间达到这个值 就关闭连接
+
+    如何重试仍然保证消息不乱序？
+        max.in.flight.requests.per.connection为1
+        在确认一批消息发送成功并且确认后 才会发送下一批消息 这样就可以保证顺序 但是严重影响吞吐量
+消费者
+    反序列化
+        org.apache.kafka.common.serialization.Deserializer<T>接口
+    拦截器
+        org.apache.kafka.clients.consumer.Consumerlnterceptor<K, V>接口
+    消费组
+        多个从同一个主题拉取消息的消费者可以被归于一个消费者组中
+        消费组均衡地给消费者分配分区 每个分区只由消费组中一个消费者消费
+
+        单一主题下分区与消费组的三种对应关系
+            分区数量多于消费者
+
+            分区数量等于消费者
+
+            分区数量小于消费者
+
+        auto.offset.reset
+            earliest：自动重置偏移量到最早的偏移量
+            latest：自动重置偏移量为最新的偏移量
+            none：如果消费组原来的（previous) 偏移量不存在，则向消费者抛异常
+            anything：向消费者抛异常
+
+        enable.auto.commit
+            如果设置为true消费者会自动周期性地向服务器提交偏移量
+            重复消费问题
+                Consumer每5s提交offset
+                假设提交offset后的3s发生了Rebalance
+                Rebalance之后的所有Consumer从上一次提交的offset处继续消费
+                因此Rebalance发生前3s的消息会被重复消费
+            手动提交
+                同步提交
+                    同步提交只有在commitSync方法返回最新offset的时候才会认为成功 会影响TPS 方法会被阻塞
+                异步提交
+                    commitAsync出现问题不会自动重试 (需要手动处理)
+        fetch.min.bytes 每次拉取消息的请求返回数据量的最小值
+        fetch.max.wait.ms 如果数据量达不到拉取最小值的话 最多间隔如此长时间进行数据拉取
+    负载均衡
+        再平衡规定了一个消费组的所有消费者如何来分配订阅主题的每个分区
+        什么时候再均衡
+            组成员发生变更
+            订阅主题数发生变更
+            订阅主题的分区数发生变更
+        再平衡
+            再平衡规定了同一消费组所有消费者如何分配topic中的每一个分区
+            再平衡时消费者无法消费消息：直到再平衡结束为止
+                消费组内消费者数量发生变更
+                主体内的分区数量发生变更
+                订阅的主题发生变化
+            重平衡过程中 Rebalance
+                消费者无法从kafka消费消息
+                这对kafka的TPS影响极大而如果kafka集内节点较多
+                    比如数百个那重平衡可能会耗时极多数分钟到数小时都有可能
+                    而这段时间kafka基本处于不可用状态
+                    所以在实际环境中应该尽量避免重平衡发生
+            避免
+                不可能完全避免再平衡
+                因为消费者岩机
+                分区增加
+                消费者增加
+                主题增加
+                要么是我们主动添加要么无法避免，因此我们要尽力避免kafka认为消费者故障这种情况的发生
+
+                session.timout.ms控制消费者心跳超时时间
+                    session.timout.ms：设置为6s
+                heartbeat.interval.ms控制消费者心跳发送频率
+                    heartbeat.interval.ms： 设置2s
+                max.poll.interval.ms控制poll的间隔
+                    max.poll.interval.ms：推荐为消费者处理消息最长耗时再加1分钟
+            命令
+                Heartbeat请求：consumer需要定期给组协调器发送心跳来表明自已还活着
+                LeaveGroup请求：主动告诉组协调器我要离开消费组
+                SyncGroup请求：消费组Leader把分配方案告诉组内所有成员
+                    一旦完成分配 Leader会将这个方案封装进SyncGroup请求中发给消费组协调器
+                    非Leader也会发SyncGroup请求
+                    只是内容为空
+                    消费组协调器接收到分配方案之后会把方案塞进SyncGroup的response中发给各个消费者
+                JoinGroup请求：成员请求加入组
+                    所有成员都向消费组协调器发送JoinGroup请求
+                    请求加入消费组
+                    一旦所有成员都发送了JoinGroup请求协调器从中选择一个消费者担任Leader的角色
+                    并把组成员信息以及订阅信息发给Leader
+                DescribeGroup请求：显示组的所有信息，包括成员信息，协议名称，分配方案，订阅信息等
+            一旦协调器发现某个消费者挂了怎么办？
+                一旦协调器认为某个消费者挂了那么它就会开启新一轮再均衡
+                并且在当前其他消费者的心跳响应中添加"REBALANCEINPROGRESS"
+                告诉其他消费者：重新分配分区。
+
