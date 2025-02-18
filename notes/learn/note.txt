@@ -839,6 +839,9 @@ Mapping 映射
         binary
         object
         nested 表示一个对象数组
+            如果实体类中存在集合类型的属性
+            那么此时就需要将该属性的类型设置为Nested类型
+            如果不设置为Nested类型ES会对该属性进行扁平化处理一旦进行了扁平化处理那么此时在搜索的时候就会出现问题
         Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序
         用于id 枚举及不需要分词的文本 例如电话号码 email地址 手机号码 邮政编码 性别等
         适用于 Filter (精确匹配） Sorting 和 Aggregations
@@ -1055,3 +1058,22 @@ Transform
 
 使用SnapshotLifecycleManagement（SLM）來管理資料的備份
     設定 定期 備份的保存時間及數量，確保備份所估用的空間不會無限增長
+
+自动补全 completion
+    CompletionSuggester实现自动补全功能
+    需要自动补全的字段类型一定是 completion 参与补全查询的字段必须是completion类型
+    字段的内容可以是用来补全的多个词条形成的数组
+    用于自动补全查询的字段的类型必须是completion
+    GET /es_index/_search
+    {
+        "suggest": {
+            "suggester": {
+                "prefix": "自动补全搜索的前缀词",
+                "completion":{
+                    field: "自动补全字段",
+                    "skip_duplicates": true, # 去重
+                    "size": 10 # 期望显示条数 (可选)
+                }
+            }
+        }
+    }
