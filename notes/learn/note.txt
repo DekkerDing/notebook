@@ -1,4 +1,51 @@
+名词
+    Broker(代理)
+        消息中间件处理节点一个Kafka节点就是一个broker
+        一个或者多个Broker可以组成一个Kafka集群
+    Topic(主题)
+        Kafka根据topic对消息进行归类
+        发布到Kafka集群的每条消息都需要指定一个topic
+    Partition(分区)
+        物理上的概念
+        一个topic可以分为多个partition每个partition内部是有序的
+    Replica(副本)
+        副本每个partion有多个副本存储在不同的broker上
+        保证消息的高可用
+    Segment(片段)
+        partition物理上由多个segment组成每个Segment存着message信息
+    Message(消息)
+        消息是基本的通讯单位
+        由一个key
+        一个value和时间戳构成
+    Producer(生产者)
+        消息生产者向Broker发送消息的客户端
+    Consumer(消费者)
+        消息消费者从Broker读取消息的客户端
+    ConsumerGroup(消费者群组）
+        每个Consumer属于一个特定的ConsumerGroup
+        一条消息可以发送到多个不同的 ConsumerGroup
+        但是一个ConsumerGroup中只能有一个Consumer能够消费该消息
+    AR
+        kafka中所有副本统称AR（AssignedRepllicas）
+        AR=ISR+OSR
+    ISR
+        和leader保持同步的follower集合
+        如果follower超过replica.lag.time.max.ms默认30s没有同步 则会被踢出isr
+    OSR
+        表示follower与leader副本同步时，延迟过多的副本
+    LEO
+        LEO（lastendoffset）就是该副本底层日志文件上的数据的最大偏移量的下一个值
+        当我知道了LEO为10 我就知道该日志文件已经保存了10条信息，位移范围为[0,9]
+    HW
+
 生产者
+    发送并忘记(fire-and-forget)
+        producer.send(record);
+    同步发送
+        producer.send(record).get();
+    异步发送
+        producer.send(record, new Callback(){});
+
     拦截器
         org.apache.kafka.clients.producer.Producerlnterceptor
         Interceptor可能被运行在多个线程中 因此在具体实现时用户需要自行确保线程安全
@@ -39,13 +86,13 @@
         每进入一个ProducerRecord都会寻找自己的ProducerBatch
         如果能写入则写入已自己的ProducerBatch
         如果不能写入那就新建一个ProducerBatch
-
-
-    压缩格式
-        none
-        gzip
-        snappy
-        lz4
+    compression
+        开启压缩compression.type=snappy
+        压缩格式
+            none
+            gzip
+            snappy
+            lz4
 
     retries 该值为一个大于1的值指的是发送消息失败后重新发送消息的次数但重试可能导致消息乱序
         retry.backoff.ms 每次重试之间等待的时间
@@ -53,11 +100,21 @@
     request.timeout.ms 客户端等待响应的最大时长 如果超时 就会重新发送，除非达到重试次数
     该设置应该比replica.lag.time.max.ms大 以免服务器延迟时间内重试
 
+    linger
+        默认情况下 linger.ms=0ms 即缓冲区buffer.memory里面一有数据就会立刻被传输到broker里面去
+        适当将linger.ms=5~100ms调大则在linger.ms时间内缓冲区里面会有更多数据
+        此时再从缓冲区中拉取数据
+        每次拉取的batch.size可以填充更多的数据
+
     batch.size 批量发送的数据量
+        需要配合 linger 每次从缓冲里面拉取可能不足batch.size=16k
 
     send.buffer.bytes 利用TCP发送数据的时候使用的缓冲区
 
     connections.max.idle.ms 当连接空闲时间达到这个值 就关闭连接
+
+    buffer.memory
+        配置buffer.memory缓冲区，默认大小32M，33554432
 
     如何重试仍然保证消息不乱序？
         max.in.flight.requests.per.connection为1
@@ -148,4 +205,29 @@
                 一旦协调器认为某个消费者挂了那么它就会开启新一轮再均衡
                 并且在当前其他消费者的心跳响应中添加"REBALANCEINPROGRESS"
                 告诉其他消费者：重新分配分区。
+    poll
+        poll：加入群组，接受分配到分区；轮询获取数据；发送心跳；自动提交
+    close
+        close：关闭网络连接；主动通知GroupCoordinator，自己已挂
 
+    幂等性
+    properties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        pid 每次重启kafka获得
+        partition：分区号
+        SeqNumber：自增号
+
+    顺序消费
+        多分区生产消费速率不同导致 乱序
+
+        单分区生产重试时导致 乱序
+            当3失败后紧接看4成功了然后3 重试成功了这样数据就乱序了
+        批次排队实现顺序
+            开启幂等性
+            生产者在收到kafka响应之前可以投递多少个消息
+            max.in.flight.requests.per.connection=1
+
+            生产者在收到kafka响应之前可以投递多少个消息
+            max.in.flight.requests.per.connection=5 retries>0允许重试
+            会缓存5个数据，并保证5个数据内不会乱序(会在缓存过程中将消息进行排序)
+
+    消息积压
