@@ -78,6 +78,33 @@ KEY命名
             非实时排行榜：定时计算榜单，如手机日销榜单
         lpush
             将一个或多个值插入到列表头部
+            LPUSH key value1 [value2]
+            移除并获取列表最后一个元素
+        llen
+            获取列表长度
+            LLEN key
+        lrange
+            获取key对应的list的指定下标范围的元素
+            其中0表示列表的第一个元素
+            1表示列表的第二个元素
+            -1表示获取所有元素（lrange key 0 -1）
+            LRANGE key start stop
+        rpop
+            移除并获取列表最后一个元素
+            RPOP key
+        rpush
+            在key对应的list的尾部添加一个元素
+            RPUSH key value1[value2]
+        lpop
+            从key对应的list的尾部删除一个元素并返回该元素
+            LPOP key
+        brpop
+            移出并获取列表的最后一个元素
+            如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
+            BRPOP LIST1 LIST2..LISTN TIMEOUT
+        lrem
+            移除元素，可以指定移除个数 (类似于去重)
+            LREM KEY COUNT VALUE
     Hash
     Set
     Sorted Set
