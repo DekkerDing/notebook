@@ -1,0 +1,83 @@
+热点Key
+    热点key的解决方案之一：避免带宽或者传输影响本地缓存热点key数据对于每次读请求将首先检查key是否存在于本地缓存中
+    如果存在则直接返回如果不存在再去访问分布式缓存的机器
+    缓存中的某些Key对应的value存储在集群中一台机器使得所有流量涌向同一机器成为系统的瓶颈
+    无法通过增加机器容量来解决
+
+配置
+    bind 绑定指定ip访问
+    daemonize 是否后台运行
+    port 端口号
+    requirepass 密码配置
+    dbfilename 配置redis持久化文件名称
+    dir 配置redis持久化文件存储地址
+    save 配置redis持久化机制
+
+KEY命名
+    不要过长本身key也占据空间
+    冒号分割不要有特殊字符(空格-引|号-转义符)
+    业务名：表名：ID
+        product-service:produdct:1
+        user:sign:1
+
+数据结构
+    通用
+        exists 判断key是否存在
+        del 删除key
+        type 判断key类型
+        ttl 查看key存活时间
+    String
+        存储字符串类型的key-value
+        值的长度不能超过512MB
+        key命名规范，不要过长，冒号分割
+        业务名：表名：ID
+        应用场景
+            验证码
+            计数器、发号器
+            订单重复提交令牌
+            热点商品卡片（序列化json对象存储）
+            分布式锁
+        set/get
+            设置和获取key-value
+        mget/mset
+            批量设置或获取多个key的值
+            MGET key[key ...]
+            MSET key value[key value...]
+        incr
+            incr对key对应的值进行加1操作并返回新的值
+            incr key
+        incrby
+            将key对应的数字加increment
+            如果key不存在操作之前key就会被置为0
+            incrby key increment
+        setex
+            设置key对应字符串value并且设置key在给定的
+            seconds
+            时间之后超时过期
+            原子操作
+            SETEX key seconds value
+        setnx
+            将key设置值为value
+            如果key不存在等同SET命令
+            当key存在时什么也不做是
+            set if not exists 的简写
+            SETNX key value
+        getset
+            设置key的值并返回key旧的值
+            GETSET KEY_NAME VALUE
+    List
+        字符串列表，按照插入顺序排序
+        双向链表，插入删除时间复杂度 o（1）快，查找为 o（n）慢
+        通常添加一个元素到列表的头部（左边）或者尾部（右边）
+        存储的都是string字符串类型
+        支持分页操作，高并发项目中，第一页数据都是来源list，第二页和更多信息则是通过数据库加载
+        一个列表最多可以包含232－1个元素（4294967295，每个列表不超过40亿个元素）
+        应用场景
+            简单队列
+            最新评论列表
+            非实时排行榜：定时计算榜单，如手机日销榜单
+        lpush
+            将一个或多个值插入到列表头部
+    Hash
+    Set
+    Sorted Set
