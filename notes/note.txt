@@ -138,4 +138,97 @@ KEY命名
             HMGET key field [field ...]
     Set
         将一个或多个成员元素加入到集合中，已经存在于集合的成员元素将被忽略
+        集合是通过哈希表实现的
+        应用场景
+            去重
+            社交应用关注、粉丝、共同好友
+            统计网站的PV、UV、IP
+            大数据里面的用户画像标签集合
+        sadd
+            添加一个或多个指定的member元素到集合的key中
+            指定一个或者多个元素member
+            如果已经在集合key中存在则忽略
+            SADD key member [member...]
+        scard
+            返回集合存储的key的基数（集合元素的数量）
+            SCARD key
+        sdiff
+            返回的集合元素是第一个key的集合与后面所有key的集合的差集
+            SDIFF key [key ...]
+        sinter
+            返回指定所有的集合的成员的交集
+            SINTER key[key ...]
+        sismember
+            返回成员member是否是存储的集合key的成员
+            SISMEMBER key member
+        srem
+            在key集合中移除指定的元素.如果指定的元素不是key集合中的元素则忽略
+            SREM key member[member..]
+        sunion
+            返回给定的多个集合的并集中的所有成员
+            SUNION key[key ...]
+        smembers
+            返回key集合所有的元素
+            SMEMBERS key
     Sorted Set
+        用于将一个或多个成员元素及其分数值加入到有序集当中
+        如果某个成员已经是有序集的成员，那么更新这个成员的分数值，分数值可以是整数值或双精度浮点数。
+        有序集合可以看做是在Set集合的的基础上为集合中的每个元素维护了一个顺序值：score
+        它允许集合中的元素可以按照score进行排序
+        底层使用到了Ziplist压缩列表和“跳跃表”两种存储结构
+        如果重复添加相同的数据，score值将被反复覆盖，保留最后一次修改的结果
+        应用场景
+            实时排行榜：商品热销榜、体育类应用热门球队、积分榜
+            优先级任务、队列
+            朋友圈文章点赞-取消，逻辑：用户只能点赞或取消，统计一篇文章被点赞了多少次，可以直接取里面有多少个成员
+        zadd
+            向有序集合添加一个或多个成员，或者更新已存在成员的分数
+            ZADD key score1 member1 [score2 member2]
+        zcard
+            获取有序集合的成员数
+            ZCARD key
+        zcount
+            计算在有序集合中指定区间分数的成员数
+            ZCOUNT key min max
+        zincrby
+            有序集合中对指定成员的分数加上增量increment
+            ZINCRBY key increment member
+        zrange
+            通过索引区间返回有序集合指定区间内的成员，成员的位置按分数值递增（从小到大）来排序
+            ZRANGE key start stop [WITHSCORES]
+        zrevrange
+            通过索引区间返回有序集合指定区间内的成员，成员的位置按分数值递增（从大到小）来排序
+            ZREVRANGE key Start stop [WITHSCORES]
+        zrevrank
+            返回有序集合中指定成员的排名，有序集成员按分数值递减（从大到小）排序
+            ZREVRANK key member
+        zrank
+            返回有序集key中成员member的排名。其中有序集成员按score值递增（从小到大）顺序排列
+            ZRANK key member
+        zrem
+            移除有序集合中的一个或多个成员
+            ZREM key member [member...]
+        zscore
+            返回有序集中，成员的分数值
+            ZSCORE key member
+跳表
+
+Java 客户端
+    jedis
+        Jedis是直连模式
+        在多个线程间共享一个Jedis实例时是线程不安全的需要使用连接池其API提供了比较全面的Redis命令的支持
+        相比于其他Redis封装框架更加原生
+        Jedis中的方法调用是比较底层的暴露的Redis的API
+        Java方法基本和Redis的API保持着一致使用阻塞的I/o方法调用同步
+        程序流需要等到socket处理完I/o才能执行
+        不支持异步操作
+    lettuce
+        高级Redis客户端，用于线程安全同步，异步和响应使用
+        基于Netty的的事件驱动，可以在多个线程间并发访问，通过异步的方式可以更好的利用系统资源
+
+RedisTemplate
+    ValueOperations：简单K-V操作
+    SetOperations：set类型数据操作
+    ZSetOperations：zset类型数据操作
+    HashOperations：针对map类型的数据操作
+    ListOerations：list类型的数据操作
