@@ -12,6 +12,11 @@
     dbfilename 配置redis持久化文件名称
     dir 配置redis持久化文件存储地址
     save 配置redis持久化机制
+        #持久化策略，10秒内有个1个key改动，执行快照
+        save 1 0
+    rdbcompression yes 导出rdb数据库文件压缩字符串和对象，默认是yes，会浪费cPu但是节省空间
+    rdbchecksum yes 导入时是否检查
+    appendonly yes  开启 AOF 默认不开启
 
 KEY命名
     不要过长本身key也占据空间
@@ -232,3 +237,236 @@ RedisTemplate
     ZSetOperations：zset类型数据操作
     HashOperations：针对map类型的数据操作
     ListOerations：list类型的数据操作
+
+分布式锁
+    排它性
+        在分布式应用集群中，同一个方法在同一时间只能被一台机器上的一个线程执行
+    容错性
+        分布式锁一定能得到释放，比如客户端奔溃或者网络中断
+    问题
+        多个命令之间不是原子性操作
+            如setnx和expire之间
+            如果 setnx成功但是expire失败
+            且宕机了则这个资源就是死锁
+            redisTemplate.opsForValue().setIfAbsent("seckill_1","success",30,TimeUnit.MILLISECONDS)
+        业务超时 存在其他线程勿删
+            可以在de1释放锁之前做一个判断
+            验证当前的锁是不是自己加的锁
+            拿value应该是存当前线程的标识或者uuid
+
+SpringCache
+    @Cacheable
+        标记在一个方法上，也可以标记在一个类上
+        缓存标注对象的返回结果，标注在方法上缓存该方法的返回值，标注在类上缓存该类所有的方法返回值
+        value缓存名称，可以有多个
+        key缓存的key规则，可以用springEL表达式，默认是方法参数组合
+        condition缓存条件，使用springEL编写，返回true才缓存
+        // 对象
+        @Cacheable(value ={"product"}，key="#root.methodName")
+        // 分页
+        @Cacheable(value = {"product_page"},key="#root.methodName + #page+'_'+#size")
+
+        methodName当前被调用的方法名
+        root.methodname
+        args当前被调用的方法的参数列表
+        root.args[0]
+        result方法执行后的返回值
+    @CachePut
+        根据方法的请求参数对其结果进行缓存，每次都会触发真实方法的调用
+        @CachePut(value ={"product"},key="#productDo.id")
+    @CacheEvict
+        从缓存中移除相应数据，触发缓存删除的操作
+        beforelnvocation= true/false
+            false 缓存的清除是否在方法之前执行，默认代表缓存清除操作是在方法执行之后执行 如果出现异常缓存就不会清除
+            true 代表清除缓存操作是在方法运行之前执行，无论方法是否出现异常，缓存都清除
+        @CacheEvict(value ={"product"},key="#root.args[0]"，cacheManager="customCacheManager")
+    @Caching
+        组合多个Cache注解使用 允许在同一方法上使用多个嵌套的@Cacheable、@CachePut和@CacheEvict注释
+
+缓存击穿 (某个热点key缓存失效了)
+    缓存中没有但数据库中有的数据
+    假如是热点数据那key在缓存过期的一刻同时有大量的请求
+    这些请求都会击穿到DB造成瞬时DB请求量大压力增大
+    和缓存雪崩的区别在于这里针对某一key缓存 后者则是很多key
+    预防
+        设置热点数据不过期
+        定时任务定时更新缓存
+        设置互斥锁
+        SpringCache解决方案
+            缓存的同步sync
+            sync可以指示底层将缓存锁住 使只有一个线程可以进入计算而其他线程堵塞直到返回结果更新到缓存中
+            @Cacheable(value ={"product"},key="#root.args[o]"，cacheManager="customCacheManager" sync=true)
+缓存雪崩(多个热点key都过期）
+    大量的key设置了相同的过期时间，导致在缓存在同一时刻全部失效，造成瞬时DB请求量大、压力骤增，引起雪崩
+    预防
+        存数据的过期时间设置随机，防止同一时间大量数据过期现象发生
+        设置热点数据永远不过期，定时任务定时更新
+        SpringCache解决方案
+            比如CacheManager配置多个过期时间维度
+缓存穿透（查询不存在数据）
+    查询一个不存在的数据，由于缓存是不命中的，并且出于容错考虑，如发起为id为"-1"不存在的数据
+    如果从存储层查不到数据则不写入缓存这将导致这个不存在的数据每次请求都要到存储层去查询
+    失去了缓存的意义
+    存在大量查询不存在的数据可能DB就挂掉了
+    这也是黑客利用不存在的key频繁攻击应用的一种方式
+    预防
+        接口层增加校验，数据合理性校验
+        缓存取不到的数据，在数据库中也没有取到，这时也可以将key-value对写为key-null，设置短点的过期时间，防止同个key被一直攻击
+        SpringCache解决方案
+            空结果也缓存，默认不配置condition或者unless就行
+
+持久化
+    RDB
+        在指定的时间间隔内将内存中的数据集快照写入磁盘
+        默认的文件名为dump.rdb
+        save
+            会阻塞当前Redis服务器，执行save命令期间，Redis不能处理其他命令，直到RDB过程完成为止
+        bgsave
+            fork创建子进程，RDB持久化过程由子进程负责，会在后台异步进行快照操作，快照同时还可以响应客户端请求
+        自动化
+            配置文件来完成 配置触发Redis的RDB持久化条件
+            比如"savemn" 表示m秒内数据集存在n次修改时 自动触发bgsave
+        主从架构
+            从服务器同步数据的时候 会发送sync执行同步操作 master主服务器就会执行bgsave
+        优点
+            RDB文件紧凑
+            全量备份
+            适合用于进行备份和灾难恢复
+            在恢复大数据集时的速度比AOF的恢复速度要快
+            生成的是一个紧凑压缩的二进制文件
+            RDB最大限度地提高了Redis的性能，父进程不需要参与磁盘I/O
+            RDB文件紧凑，全量备份，适合用于进行备份和灾难恢复
+            在恢复大数据集时的速度比AOF的恢复速度要快
+        缺点
+            每次快照是一次全量备份
+            fork子进程进行后台操作子进程存在开销
+            在快照持久化期间修改的数据不会被保存
+            可能丢失数据
+            如果您需要在Redis停止工作时（例如断电后）
+            将数据丢失的可能性降至最低则RDB并不好
+            RDB经常需要fork（）才能使用子进程持久存储在磁盘上
+            如果数据集很大，Fork（）可能会非常耗时
+    AOF
+        appendonlyfile，追加文件的方式，文件容易被人读懂
+        以独立日志的方式记录每次写命令，重启时再重新执行AOF文件中的命令达到恢复数据的目的
+        写入过程岩机，也不影响之前的数据，可以通过redis-check-aof检查修复问题
+        AOF文件名通过appendfilename配置设置，默认文件名是appendonly.aof
+        存储路径同RDB持久化方式一致，使用dir配置
+        Redis每次写入命令会追加到aof_buf（缓冲区）
+        AOF缓冲区根据对应的策略向硬盘做同步操作
+        高频AOF会带来影响，特别是每次刷盘
+        appendfsync always
+            每次有数据修改发生时都会写入AOF文件，消耗性能多
+        appendfsync everysec
+            每秒钟同步一次，该策略为AOF的缺省策略。
+        appendfsync no
+            不主从同步，由操作系统自动调度刷磁盘，性能是最好的，但是最不安全
+        rewrite重写
+            AOF文件越来越大，需要定期对AOF文件进行重写达到压缩
+            旧的AOF文件含有无效命令会被忽略，保留最新的数据命令
+            多条写命令可以合并为一个
+            AOF重写降低了文件占用空间
+            更小的AOF文件可以更快地被Redis加载
+            重写触发
+                直接调用bgrewriteaof命令
+                auto-aof-rewrite-min-size和auto-aof-rewrite-percentage参数
+                auto-aof-rewrite-min-size
+                    表示运行AOF重写时文件最小体积，默认为64MB
+                    AOF文件最小重写大小只有当AOF文件大小大于该值时候才可能重写
+                    6.x默认配置64mb
+                auto-aof-rewrite-percentage
+                    代表当前AOF文件空间和上一次重写后AOF文件空间（aof_base_size）的比值
+                    当前AOF文件大小和最后一次重写后的大小之间的比率等于或者等于指定的增长百分比
+                    如100代表当前AOF文件是上次写的两倍
+                    时候才重写。
+            aof-load-truncated yes
+                加载aof时如果有错如何处理
+                yes表示如果aof尾部文件出问题，写log记录并继续执行。no表示提示写入等待修复后写入
+        优点
+            数据更加安全
+            当RedisAOF文件太大时
+            Redis能够在后台自动重写AOF
+            AOF以易于理解和解析的格式一个接一个地包含所有操作的日志
+        缺点
+            AOF文件通常比同一数据集的等效RDB文件大
+            根据确切的fsync策略
+            AOF可能比RDB慢
+    AOF+RDB混合模式
+        RDB持久化以指定的时间间隔执行数据集的时间点快照。
+        AOF持久化记录服务器接收的每个写入操作
+        将在服务器启动时再次读取重建原始数据集
+        使用与Redis协议本身相同的格式以仅追加方式记录命令
+        当文件太大时Redis能够重写
+        推荐方案
+            RDB持久化与AOF持久化一起使用
+            如果Redis中的数据并不是特别敏感或者可以通过其它方式重写生成数据
+            集群中可以关闭AOF持久化靠集群的备份方式保证可用性
+            自己制定策略定期检查Redis的情况，然后可以手动触发备份、重写数据；
+            采用集群和主从同步
+        Redis4.0后开始的rewrite支持混合模式
+            就是rdb和aof一起用
+            直接将rdb持久化的方式来操作将二进制内容覆盖到aof文件中，rdb是二进制，所以很小
+            有写入的话还是继续append追加到文件原始命令，等下次文件过大的时候再次rewrite
+            默认是开启状态
+            优点
+                混合持久化结合了RDB持久化和AOF持久化的优点
+                采取了rdb的文件小易于灾难恢复同时结合AOF
+                增量的数据以AOF方式保存了数据更少的丢失
+            缺点
+                前部分是RDB格式，是二进制，所以阅读性较差
+            数据恢复
+                先看是否存在aof文件
+                若存在则先按照aof文件恢复
+                aof比rdb全且aof文件也rewrite成rdb二进制格式若aof不存在
+                则才会查找rdb是否存在
+
+过期删除
+    Redis如何淘汰过期的keys： set name xdclass 3600
+    Redis服务器实际使用的是惰性删除和定期删除两种策略：
+    通过配合使用这两种删除策略
+    服务器可以很好地在合理使用CPU时间和避免浪费内存空间之间取得平衡
+    定期删除
+        隔一段时间，就随机抽取一些设置了过期时间的key，检查其是否过期，如果过期就删除
+        定期删除可能会导致很多过期key到了时间并没有被删除掉，那咋整呢，所以就是惰性删除
+    惰性删除
+        概念：当一些客户端尝试访问它时，key会被发现并主动的过期
+        放任键过期不管，但是每次从键空间中获取键时，都检查取得的键是否过期，如果过期的话，就删除该键
+    如果定期删除漏掉了很多过期key，然后你也没及时去查，也就没走惰性删除，此时会怎么样？
+
+    如果大量过期key堆积在内存里，导致redis内存块耗尽了，就需要走内存淘汰机制
+
+内存淘汰机制
+    内存不足时-Redis的Key内存淘汰策略
+    redis在占用的内存超过指定的maxmemory之后
+    通过maxmemory_policy确定redis是否释放内存以及如何释放内存
+    策略
+        volatile-lru(least recently used)
+            最近最少使用算法，从设置了过期时间的键中选择空转时间最长的键值对清除掉
+        volatile-lfu(least frequently used)
+            最近最不经常使用算法，从设置了过期时间的键中选择某段时间之内使用频次最小的键值对清除掉
+        volatile-ttl
+            从设置了过期时间的键中选择过期时间最早的键值对清除；
+        volatile-random
+            从设置了过期时间的键中，随机选择键进行清除；
+        allkeys-lru
+            最近最少使用算法，从所有的键中选择空转时间最长的键值对清除；
+        allkeys-lfu
+            最近最不经常使用算法，从所有的键中选择某段时间之内使用频次最少的键值对清除；
+        allkeys-random
+            所有的键中，随机选择键进行删除；
+        noeviction
+            不做任何的清理工作，在redis的内存超过限制之后，所有的写入操作都会返回错误；但是读操作都能正常的进行；
+
+Cluster集群和分片
+
+linux内存分配策略
+    0
+        表示内核将检查是否有足够的可用内存供应用进程使用；
+        如果有足够的可用内存内存申请允许；
+        否则内存申请失败并把错误返回给应用进程
+    1
+        表示内核允许分配所有的物理内存而不管当前的内存状态如何
+    2
+        表示内核允许分配超过所有物理内存和交换空间总和的内存
+    设置方式
+        echo1>/proc/sys/vm/overcommit_memory
