@@ -458,6 +458,21 @@ SpringCache
             不做任何的清理工作，在redis的内存超过限制之后，所有的写入操作都会返回错误；但是读操作都能正常的进行；
 
 Cluster集群和分片
+    常见的数据分区算法
+        哈希取模
+            对选择的partitioningkey计算其哈希值，得到的哈希值就是对应的分区
+        范围分片
+            通过确定分区键是否在某个范围内来选择分区
+        一致性Hash分区
+            rediscluster集群没有采用一致性哈希方案，而是采用【数据分片】中的哈希槽来进行数据存储与读取的
+    什么是Redis的哈希槽slot
+        Redis集群预分好16384个桶，当需要在Redis集群中放置一个key-value时，根据CRC16(key)mod16384 的值，决定将一个key放到哪个桶中
+
+Client-Side-Caching客户端缓存
+    类似浏览器缓存一样
+    redis在服务端记录访问的连接和相关的key，当key有变化时通知相应的应用
+    应用收到请求后自行处理有变化的key，进而实现clientcache与redis的一致
+    这需要客户端实现，目前lettuce对其进行了支持
 
 linux内存分配策略
     0
