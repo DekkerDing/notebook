@@ -31,6 +31,9 @@ KEY命名
         del 删除key
         type 判断key类型
         ttl 查看key存活时间
+            XX：具有时效性的数据
+            -1：永久有效的数据
+            -2：已经过期的数据 或 被删除的数据 或 未定义的数据
     String
         存储字符串类型的key-value
         值的长度不能超过512MB
@@ -314,6 +317,13 @@ SpringCache
         缓存取不到的数据，在数据库中也没有取到，这时也可以将key-value对写为key-null，设置短点的过期时间，防止同个key被一直攻击
         SpringCache解决方案
             空结果也缓存，默认不配置condition或者unless就行
+缓存预热
+    请求数量较高
+    主从之间数据吞吐量较大，数据同步操作频度较高
+    方案
+        日常例行统计数据访问记录统计访问频度较高的热点数据
+            利用LRU数据删除策略构建数据留存队列
+            storm与kafka配合
 
 持久化
     RDB
@@ -428,31 +438,53 @@ SpringCache
     定期删除
         隔一段时间，就随机抽取一些设置了过期时间的key，检查其是否过期，如果过期就删除
         定期删除可能会导致很多过期key到了时间并没有被删除掉，那咋整呢，所以就是惰性删除
+        周期性轮询redis库中的时效性数据，采用随机抽取的策略，利用过期数据占比的方式控制删除频度
+        特点1：CPU性能占用设置有峰值，检测频度可自定义设置
+        特点2：内存压力不是很大，长期占用内存的冷数据会被持续清理
+        总结：周期性抽查存储空间 (随机抽查，重点抽查)
     惰性删除
+        数据到达过期时间，不做处理。等下次访问该数据时
+        如果未过期，返回数据 发现已过期，删除，返回不存在
         概念：当一些客户端尝试访问它时，key会被发现并主动的过期
         放任键过期不管，但是每次从键空间中获取键时，都检查取得的键是否过期，如果过期的话，就删除该键
+        优点
+            节约CPU性能，发现必须删除的时候才删除
+        缺点
+            内存压力很大，出现长期占用内存的数据
+        总结：用存储空间换取处理器性能 (拿空间换时间)
+    定时删除
+        创建一个定时器，当key设置有过期时间，且过期时间到达时，由定时器任务立即执行对键的删除操作
+        总结：用处理器性能换取存储空间 (拿时间换空间)
+        优点
+            节约内存，到时就删除，快速释放掉不必要的内存占用
+        缺点
+            CPU压力很大，无论CPU此时负载量多高，均占用CPU，会影响redis服务器响应时间和指令吞吐量
+    1． 定时删除 节约内存，无占用 不分时段占用CPU资源，频率高
+    2． 惰性删除 内存占用严重 延时执行，CPU利用率高
+    3． 定期删除 内存定期随机清理 每秒花费固定的CPU资源维护内存
     如果定期删除漏掉了很多过期key，然后你也没及时去查，也就没走惰性删除，此时会怎么样？
-
     如果大量过期key堆积在内存里，导致redis内存块耗尽了，就需要走内存淘汰机制
 
 内存淘汰机制
     内存不足时-Redis的Key内存淘汰策略
     redis在占用的内存超过指定的maxmemory之后
+    maxmemory-samples count
+        每次选取待删除数据的个数，采用随机获取数据的方式作为待检测删除数据
     通过maxmemory_policy确定redis是否释放内存以及如何释放内存
     策略
-        volatile-lru(least recently used)
+        volatile-lru(least recently used) 检测易失数据 长时间不活跃数据
             最近最少使用算法，从设置了过期时间的键中选择空转时间最长的键值对清除掉
-        volatile-lfu(least frequently used)
+        volatile-lfu(least frequently used) 检测易失数据 使用次数最少的
             最近最不经常使用算法，从设置了过期时间的键中选择某段时间之内使用频次最小的键值对清除掉
-        volatile-ttl
+        volatile-ttl 检测易失数据
             从设置了过期时间的键中选择过期时间最早的键值对清除；
-        volatile-random
+        volatile-random 检测易失数据
             从设置了过期时间的键中，随机选择键进行清除；
-        allkeys-lru
+        allkeys-lru 检测全库数据
             最近最少使用算法，从所有的键中选择空转时间最长的键值对清除；
-        allkeys-lfu
+        allkeys-lfu 检测全库数据
             最近最不经常使用算法，从所有的键中选择某段时间之内使用频次最少的键值对清除；
-        allkeys-random
+        allkeys-random 检测全库数据
             所有的键中，随机选择键进行删除；
         noeviction
             不做任何的清理工作，在redis的内存超过限制之后，所有的写入操作都会返回错误；但是读操作都能正常的进行；
@@ -474,6 +506,33 @@ Client-Side-Caching客户端缓存
     应用收到请求后自行处理有变化的key，进而实现clientcache与redis的一致
     这需要客户端实现，目前lettuce对其进行了支持
 
+性能指标与监控
+    性能指标：Performance
+        latency 响应请求的平均时间
+        instantaneous_ops_per_sec 平均每秒处理请求总数量
+        hit_rate(calculated) 缓存查询命中率（通过查询总次数与查询得到非nil数据总次数计算而来）
+    内存指标：Memory
+        used_memory 当前内存使用量
+        mem_fragmentation_ratio 内存碎片率（关系到是否进行碎片整理）
+        evicted keys 为避免内存溢出删除的key的总数量
+        blocked clients 基于阻塞操作（BLPOP等）影响的客户端数量
+    基本活动指标：Basicactivity
+        connected_clients 当前客户端连接总数
+        connected slaves 当前连接slave总数
+        master_last_io_seconds_ago 最后一次主从信息交换距现在的秒数
+        keyspace key的总数
+    持久性指标：Persistence
+        rdb_last_save_time 当前服务器最后一次RDB持久化的时间
+        rdb_changes_since_last save 当前服务器最后一次RDB持久化后数据变化总量
+    错误指标：Error
+        rejected_connections 被拒绝连接的客户端总数（基于达到最大连接值的因素）
+        keyspace_misses key未命中的总次数
+        master_link_down_since_seconds ，主从断开的秒数
+    benchmark
+        测试当前服务器的并发性能
+        redis-benchmark [-h] [-p] [-c] [-n <requests]> [-k]
+        100个连接，5000次请求对应的性能
+        redis-benchmark -c 100 -n 5000
 linux内存分配策略
     0
         表示内核将检查是否有足够的可用内存供应用进程使用；
