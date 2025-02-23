@@ -340,6 +340,75 @@ SpringCache
             利用LRU数据删除策略构建数据留存队列
             storm与kafka配合
 
+Redis 大Key
+    在Redis中，大key指的是key对应的value值所占的内存空间比较大。
+    value是string类型，大小控制在10kb以内
+    value是hash、list、set、zset等集合类型，元素个数不要超过5000（或则1万、几万)
+    主要是根据value的大小和元素个数来确定，业务也可以根据自已的场景确定标准。
+    很多朋友肯定在想redis的key能有多大呀？
+    这里就有个误区了，所谓的大key问题是某个key对应的value比较大
+    所以本质上是大value问题。
+    key往往是开发过程中可以自行设置
+    可以控制大小
+    value往往不受程序控制跟业务场景有关系
+    因此可能导致value很大
+    总结
+        大key的产生往往是业务方设计不合理，没有预见vaule的动态增长问题
+        一直往value塞数据，没有删除及过期机制，迟早要爆炸
+        数据没有合理做分片，将大key变成以一个个小key
+        第一，是不是有必要把所有字段都缓存
+        第二，有没有相关联的数据，关联数据分开存储
+    出来的现象
+        客户端超时阻塞
+        由于Redis单线程的特性，操作bigkey的通常比较耗时
+        也就意味着阻塞Redis可能性越大，这样会造成客户端阻塞或者引起故障切换
+        会出现各种redis 慢查询中。
+        内存空间不均匀
+        集群模式在slot分片均匀情况下，会出现数据和查询倾斜情况
+        部分有大key的Redis节点占用内存多
+        QPS高。
+        引发网络阻塞
+        每次获取大key产生的网络流量较大
+        如果一个key的大小为1MB，每秒访问量为1000
+        那么每秒会产生1000MB的流量。
+        这对于普通千兆网卡的服务器来说是灾难性的
+        阻塞工作线程
+        执行大key删除时，在低版本redis中可能阻塞线程。
+    处理/删除
+        如果对这类大key直接使用del命令进行删除
+        会导致长时间阻塞
+        甚至崩溃因为del命令在删除集合类型数据时
+        时间复杂度为O(M)，M是集合中元素的个数。
+        Redis是单线程的，单个命令执行时间过长就会阻塞其他命令，容易引起雪崩。那我们怎么解决呢？
+            主动删除大 key
+            分批次渐进式删除
+            一般来说，对于strint数据类型使用del命令不会产生阻塞。
+            其它数据类型分批删除，通过 scan命令遍历大key，每次取得少部分元素进行删除，然后再获取和删除下一批元素。
+            对Hash，SortedSet，List，Set分别处理，思路相同，先对key改名进行逻辑删除，使客户端无法使用原key，然后使用批量小步删除。
+            删除大Hash
+                key改名，相当于逻辑上把这个key删除了，任何redis命令都访问不到这个key了
+                小步多批次的删除
+                redis.HDEL(newkey,hash_keys)
+            删除大List
+                redis.LTRIM（newkey,0,-99)
+            删除大Set
+                redis.SREM(newkey,members)
+            删除大Sorted Set
+                redis.ZREMRANGEBYRANK(newkey,0，99)
+        采用unlink+bigkey异步非阻塞删除。这个命令是在redis4.0+提供的代替del命令，
+        被动删除大key
+            被动删除是指利用redis自身的key清除策略，配置lazyfree惰性删除。但是参数默认是关闭的
+                lazyfree-lazy-expire on #过期情性删除
+                lazyfree-lazy-eviction on  #超过最大内存情性删除
+                lazyfree-lazy-server-del on #服务端被动惰性删除
+    设计
+        从业务角度评估，value中只存储有用的字段，尽量去掉无用的字段。
+        可以考虑在应用层先对value进行压缩，比如采用LZ4/Snappy之类的压缩算法
+        配合redis客户端序列化配置，可以无侵人完成value的压缩。
+        value设计的时候越小越好，关联的数据分不同的key进行存储。
+        大key分拆成几个key-value
+        使用multiGet获取值，这样分拆的意义在于分拆单次操作的压力，将操作压力平摊到多个redis实例中
+        降低对单个redis的IO影响
 订阅与发布
 
 事务
@@ -579,6 +648,9 @@ Client-Side-Caching客户端缓存
         读写操作都直接操作缓存，由线程异步的将缓存数据同步到数据库
     先删除后更新数据： 可能存在不一致性
     先更新再删除 推荐
+
+分布式锁
+
 
 布隆过滤器
     布隆过滤是一种数据统计的算法，用于检索一个元素是否存在一个集合中
