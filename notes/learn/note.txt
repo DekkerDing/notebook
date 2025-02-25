@@ -34,10 +34,12 @@
     OSR
         表示follower与leader副本同步时，延迟过多的副本
     LEO
+        每个副本的最后一个offset
         LEO（lastendoffset）就是该副本底层日志文件上的数据的最大偏移量的下一个值
         当我知道了LEO为10 我就知道该日志文件已经保存了10条信息，位移范围为[0,9]
     HW
-
+        所有副本中最小的LEO
+        指的是消费者能见到的最大的offset，ISR队列中最小的LEO。
 生产者
     发送并忘记(fire-and-forget)
         producer.send(record);
@@ -77,6 +79,38 @@
                 isr指的是与leader数据同步的follower分区
             osr
                 osr指的是与leader数据不那么同步 或者说复制进度落下的follower分区
+    Exactly Once
+        At Least Once
+            将服务器的ACK级别设置为-1，可以保证Producer到Server之间不会丢失数据 即 At Least Once
+        At Most Once
+            相对的，将服务器ACK级别设置为O，可以保证生产者每条消息只会被发送一次，即 At Most Once
+        AtLeast Once + 幂等性 = ExactlyOnce
+            0.11版本的Kafka，引入了一项重大特性：幂等性。
+            所谓的幂等性就是指Producer不论向Server发送多少次重复数据，Server端都只会持久化一条。
+            幂等性结合AtLeastOnce语义就构成了Kafka的ExactlyOnce语义
+            要启用幂等性，只需要将Producer的参数中 enable.idompotence 设置为true即可。
+            Kafka 的幂等性实现其实就是将原来下游需要做的去重放在了数据上游。
+            开启幂等性的Producer在初始化的时候会被分配一个PID，发往同一Partition的消息会附带SequenceNumber。而
+            Broker端会对<PID,Partition,SeqNumber>做缓存，当具有相同主键的消息提交时，Broker只会持久化一条。
+            但是PID重启就会变化，同时不同的Partition也具有不同主键，所以幂等性无法保证跨分区跨会话的ExactlyOnce。
+    事务
+        Kafka从0.11版本开始引入了事务支持。
+        事务可以保证Kafka在ExactlyOnce语义的基础上，生产和消费可以跨分区和会话
+        要么全部成功，要么全部失败。
+        Producer事务
+            为了实现跨分区跨会话的事务，需要引入一个全局唯一的TransactionID，并将Producer
+            获得的PID和TransactionID绑定。
+            这样当Producer重启后就可以通过正在进行的Transaction ID 获得原来的PID。
+            为了管理Transaction，Kafka引入了一个新的组件TransactionCoordinator。
+            Producer就是通过和TransactionCoordinator交互获得TransactionID对应的任务状态。
+            Transaction Coordinator还负责将事务所有写入Kafka的一个内部Topic
+            这样即使整个服务重启，由于事务状态得到保存，进行中的事务状态可以得到恢复，从而继续进行。
+        Consumer 事务
+            上述事务机制主要是从Producer方面考虑，对于Consumer而言，事务的保证就会相对较弱，尤其时无法保证Commit的信息被精确消费。
+            这是由于Consumer可以通过offset访问任意信息，而且不同的 SegmentFile生命周期不同
+            同一事务的消息可能会出现重启后被删除的情况。
+
+
     消息收集器
         消息收集器RecoderAccumulator为每个分区都维护了一个 Deque<ProducerBatch>类型的双端队列
         ProducerBatch
@@ -205,6 +239,10 @@
                 一旦协调器认为某个消费者挂了那么它就会开启新一轮再均衡
                 并且在当前其他消费者的心跳响应中添加"REBALANCEINPROGRESS"
                 告诉其他消费者：重新分配分区。
+    pull
+        pull 模式不足之处是，如果kafka 没有数据，消费者可能会陷入循环中，一直返回空数据。
+        针对这一点，Kafka的消费者在消费数据时会传入一个时长参数timeout，如果当前没有数据可供消费，consumer会等待一段时间之后再返回，
+        这段时长即为 timeout。
     poll
         poll：加入群组，接受分配到分区；轮询获取数据；发送心跳；自动提交
     close
