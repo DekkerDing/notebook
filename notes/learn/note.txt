@@ -29,6 +29,8 @@
         kafka中所有副本统称AR（AssignedRepllicas）
         AR=ISR+OSR
     ISR
+        一组与Topic分区的Leader保持同步的Follower 分区副本
+        ISR列表中的副本会定期向Leader 同步数据，确保数据的一致性
         和leader保持同步的follower集合
         如果follower超过replica.lag.time.max.ms默认30s没有同步 则会被踢出isr
     OSR
@@ -117,7 +119,6 @@
             这是由于Consumer可以通过offset访问任意信息，而且不同的 SegmentFile生命周期不同
             同一事务的消息可能会出现重启后被删除的情况。
 
-
     消息收集器
         消息收集器RecoderAccumulator为每个分区都维护了一个 Deque<ProducerBatch>类型的双端队列
         ProducerBatch
@@ -185,6 +186,20 @@
             原理：将磁盘文件映射到内存，用户通过修改内存就能修改磁盘文件。
             使用这种方式可以获取很大的/O提升
             省去了用户空间到内核空间复制的开销
+    优化
+        batch.size 64KB-1MB
+            批次大小指的是生产者在将消息发送到KafkaBroker之前会将多条消息收集到一个批次中进行发送。
+            增大批次大小可以显著减少网络请求次数，因为每次发送更多的消息，从而提高了网络传输的效率，有助于提升整体的吞吐量。
+            然而，这也会带来一定的延迟，因为生产者需要等待更多的消息填满批次。
+            如果批次一直无法填满，消息就会在生产者端停留更长时间，直到达到其他触发发送的条件。
+            在高吞吐量且对延迟要求不是特别苛刻的场景下，可以适当增大该值。
+        linger.ms 10 - 100ms
+        max.in.flight.requests.per.connection
+            该参数限制了单个连接上允许的最大未确认请求数。
+            在Kafka中，生产者可以在一个连接上同时发送多个请求而无需等待每个请求的响应。
+            如果将该值设置得过高，可能会导致消息的顺序被破坏。
+            例如，当一个请求失败并重试时，后续已经发送的请求可能会先到达Broker，从而导致消息的顺序不一致。
+            因此，需要根据实际情况合理设置该值，以平衡吞吐量和消息顺序性。
 消费者
     反序列化
         org.apache.kafka.common.serialization.Deserializer<T>接口
@@ -289,20 +304,40 @@
         SeqNumber：自增号
 
     顺序消费
-        多分区生产消费速率不同导致 乱序
-
-        单分区生产重试时导致 乱序
+        kafka为什么会存在无序消费
+            因为消费者是完全独立的一个网络节点
+            所以可能会出现消息的消费顺序不是按照发送顺序来实现的
+            从而导致消息的消费乱续的问题
+            多分区生产消费速率不同导致 乱序
+            单分区生产重试时导致 乱序
             当3失败后紧接看4成功了然后3 重试成功了这样数据就乱序了
-        批次排队实现顺序
-            开启幂等性
-            生产者在收到kafka响应之前可以投递多少个消息
-            max.in.flight.requests.per.connection=1
-
+        kafka如何保证有序消费
+            自定义消息分区的一个路由算法
+            批次排队实现顺序
+                开启幂等性
+                生产者在收到kafka响应之前可以投递多少个消息
+                max.in.flight.requests.per.connection=1
             生产者在收到kafka响应之前可以投递多少个消息
             max.in.flight.requests.per.connection=5 retries>0允许重试
             会缓存5个数据，并保证5个数据内不会乱序(会在缓存过程中将消息进行排序)
 
     消息积压
+
+    优化
+        fetch.min.bytes 1M - 10MB
+
+        fetch.max.wait.ms 500ms
+
+        max.poll.records 500-5000
+
+        auto.offset.reset earliest
+
+Broker
+
+    优化
+        log.flush.interval.messages 1（立即刷盘，性能差)， n（批量刷盘，性能好，会丢数据）
+        log.flush.interval.ms 1000-5000ms
+
 
 消息的 推模式与拉模式
     push
