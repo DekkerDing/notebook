@@ -47,6 +47,13 @@
         producer.send(record).get();
     异步发送
         producer.send(record, new Callback(){});
+        Kafka的Producer发送消息采用的是异步发送的方式。
+        在消息发送的过程中，涉及到了
+        两个线程
+        main线程和Sender线程，以及一个线程共享变量
+        RecordAccumulator.
+        main线程 将消息发送给 RecordAccumulator
+        Sender线程 不断从 RecordAccumulator 中拉取消息发送到 Kafka broker。
 
     拦截器
         org.apache.kafka.clients.producer.Producerlnterceptor
