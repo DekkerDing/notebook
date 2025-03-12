@@ -25,3 +25,6 @@
 /examples/.gradle/7.6.4/fileChanges/last-build.bin
 /examples/.gradle/7.6.4/checksums/md5-checksums.bin
 /examples/.gradle/7.6.4/checksums/sha1-checksums.bin
+/.idea/.gitignore
+/.idea/dictionaries/Ding.xml
+/.idea/modules/examples.main.iml
