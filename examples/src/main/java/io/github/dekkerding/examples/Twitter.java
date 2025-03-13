@@ -13,7 +13,7 @@ public class Twitter {
 
     private Map postTweetMap  =new LinkedHashMap<String ,Stack<String>>();
 
-    private Stack<String> stack = new Stack();
+    private Deque stack = new ArrayDeque<String>();
 
     public  String postTweet( String userId,String tweetId ){
         // 根据给定的tweetId 和userId 创建一条新推文。每次调用此函数都会使用一个不同的tweetId
