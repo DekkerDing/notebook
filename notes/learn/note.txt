@@ -606,6 +606,9 @@ Redis 大Key
             所有的键中，随机选择键进行删除；
         noeviction
             不做任何的清理工作，在redis的内存超过限制之后，所有的写入操作都会返回错误；但是读操作都能正常的进行；
+    FIFO（FirstInFirstOut，先进先出）根据缓存被存储的时间，离当前最远的数据优先被淘汰；
+    LRU（LeastRecentlyUsed，最近最少使用）根据最近被使用的时间，离当前最远的数据优先被淘汰；
+    LFU（LeastFrequentlyUsed，最不经常使用）在一段时间内，缓存数据被使用次数最少的会被淘汰
 
 Cluster集群和分片
     常见的数据分区算法
