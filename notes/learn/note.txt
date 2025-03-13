@@ -1,0 +1,144 @@
+IOC
+    控制对象的创建
+    控制对象内属性的赋值
+    表示如果用Spring，那么Spring会负责来创建对象，以及给对象内的属性赋值，
+    也就是如果用Spring，那么对象的控制权会转交给Spring
+
+AOP
+
+单例Bean和单例模式
+    单例模式表示VM中某个类的对象只会存在唯一一个。
+    而单例Bean并不表示JVM中只能存在唯一的某个类的Bean对象
+    通过相同的Bean名称 在同一个Spring容器中 获取的Bean 对象是一个 单例Bean
+
+Spring容器启动流程是怎样的
+    1.在创建Spring容器，也就是启动Spring时：
+    2.首先会进行扫描，扫描得到所有的BeanDefinition对象，并存在一个Map中
+    3.然后筛选出非懒加载的单例BeanDefinition进行创建Bean
+    对于多例Bean不需要在启动过程中去进行创建
+    对于多例Bean会在每次获取Bean时利用BeanDefinition去创建
+    4.利用BeanDefinition创建Bean就是Bean的创建生命周期
+        这期间包括了合并BeanDefinition、
+        推断构造方法、
+        实例化、
+        属性填充、
+        初始化前、
+        初始化、
+        初始化后等步骤其中AOP就是发生在初始化后这一步骤中
+    5.单例Bean创建完了之后，Spring会发布一个容器启动事件
+    6.Spring启动结束
+    7.  比如源码中会提供一些模板方法，让子类来实现，
+        比如源码中还涉及到一些BeanFactoryPostProcessor和BeanPostProcessor的注册
+        Spring的扫描就是通过BenaFactoryPostProcessor来实现的
+        依赖注入就是通过BeanPostProcessor来实现的
+    8.在Spring启动过程中还会去处理 @Import 等注解
+    Spring中的Bean创建的生命周期有哪些步骤
+    Spring中一个Bean的创建大概分为以下几个步骤：
+        1.推断构造方法
+        2.实例化
+        3.填充属性，也就是依赖注入
+        4.处理Aware回调
+        5.初始化前，处理@PostConstruct注解
+        6.初始化，处理InitializingBean接口
+        7.初始化后，进行AOP
+
+Spring事务传播机制
+    多个事务方法相互调用时，事务如何在这些方法间传播
+    方法A是一个事务的方法，方法A执行过程中调用了方法B
+    那么方法B有无事务以及方法B对事务的要求不同都会对方法A的事务具体执行造成影响
+    同时方法A的事务对方法B的事务执行也有影响
+    这种影响具体是什么就由两个方法所定义的事务传播类型所决定。
+    1.REQUIRED(Spring默认的事务传播类型)：如果当前没有事务，则自己新建一个事务，如果当前存在事务，则加入这个事务
+    2.SUPPORTS：当前存在事务，则加入当前事务，如果当前没有事务，就以非事务方法执行
+    3.MANDATORY：当前存在事务，则加入当前事务，如果当前事务不存在，则抛出异常。
+    4.REQUIRES_NEW：创建一个新事务，如果存在当前事务，则挂起该事务。
+    5.NOT_SUPPORTED：以非事务方式执行，如果当前存在事务，则挂起当前事务
+    6.NEVER：不使用事务，如果当前事务存在，则抛出异常
+    7.NESTED：如果当前事务存在，则在嵌套事务中执行，否则REQUIRED的操作一样（开启一个事务）
+
+Spring中的事务是如何实现的
+    1.Spring事务底层是基于数据库事务和AOP机制的
+    2.首先对于使用了@Transactional注解的Bean，Spring会创建一个代理对象作为Bean
+    3.当调用代理对象的方法时，会先判断该方法上是否加了@Transactional注解
+    4.如果加了，那么则利用事务管理器创建一个数据库连接
+    5.并且修改数据库连接的autocommit属性为false，禁止此连接的自动提交，这是实现Spring事务非常重要的一步
+    6.然后执行当前方法，方法中会执行sql
+    7.执行完当前方法后，如果没有出现异常就直接提交事务
+    8.如果出现了异常，并且这个异常是需要回滚的就会回滚事务，否则仍然提交事务
+    9.Spring事务的隔离级别对应的就是数据库的隔离级别
+    10.Spring事务的传播机制是Spring事务自己实现的，也是Spring事务中最复杂的
+    11，Spring事务的传播机制是基于数据库连接来做的，一个数据库连接一个事务，
+    如果传播机制配置为需要新开一个事务
+    那么实际上就是先建立一个数据库连接，在此新数据库连接上执行sql
+
+Spring事务什么时候会失效？
+    spring事务的原理是AOP
+    进行了切面增强
+    那么失效的根本原因是这个AOP不起作用了
+    常见情况有如下几种
+        1、发生自调用，类里面使用this调用本类的方法（this通常省略），此时这个this对象不是代理类，而是UserService对象本身
+            解决方法很简单，让那个this变成UserService的代理类即可
+        2、方法不是public的：@Transactional只能用于public的方法上，否则事务不会失效
+            如果要用在非public方法上，可以开启Aspect代理模式。
+        3、数据库不支持事务
+        4、没有被spring管理
+        5、异常被吃掉，事务不会回滚（或者抛出的异常没有被定义，默认为RuntimeException)
+
+BeanFactory 与 FactoryBean
+
+    https://www.bilibili.com/video/BV18C4y1A7EQ/?spm_id_from=333.337.search-card.all.click
+
+    FactoryBean是一个接口
+        它是一个Bean
+        FactoryBean并不是一个简单的Bean，而是一个能生产或者修饰对象生成的工厂Bean
+        它最大的一个作用是：可以让我们自定义Bean的创建过程。
+
+    BeanFactory (策略工厂模式)
+        以Factory结尾，说明它是一个工厂类
+        它是一个负责生产和管理bean的工厂
+        在Spring中，BeanFactory是IOC容器的核心接口
+        它的职责包括：实例化、定位、配置应用程序中的对象及建立这些对象间的依赖
+
+Spring 设计模式
+    工厂模式
+        BeanFactory FactoryBean ProxyFactory
+    原型模式
+        PrototypeTargetSource
+        PrototypeAspectinstanceFactory
+    单例模式
+        SingletonTargetSource
+        DefaultBeanNameGenerator
+        SimpleAutowireCandlidateResolver
+        AnnotationAwareOrderComparator
+    构造器模式
+        BeanDefinitionBuilder
+        StringBuilder
+        BeanFactoryAspectUAdvisorsBuilder
+    适配器模式
+        AdvisorAdapter
+        ApplicationListenerMethodAdapter
+    访问者模式
+        PropertyAccessor
+        MessageSourceAccessor
+    装饰者模式
+        BeanWrapper
+        HttpRequestWrapper
+    策略模式
+        InstantiationStrategy BeanNameGenerator
+    模板方法
+        AbstractApplicationContext
+    责任链模式
+        DefaultAdvisorChainFactory
+        QualifierAnnotationAutowireCandidateResolver
+    观察者模式
+        ApplicationListener
+        AdvisedSupportListener
+
+Spring中Bean是线程安全的吗
+    Spring本身并没有针对Bean做线程安全的处理
+        1.如果Bean是无状态的，那么Bean则是线程安全的
+        2.如果Bean是有状态的，那么Bean则不是线程安全的
+        另外，Bean是不是线程安全，跟Bean的作用域没有关系
+            Bean的作用域只是表示Bean的生命周期范围
+                对于任何生命周期的Bean都是一个对象
+                这个对象是不是线程安全的还是得看这个Bean对象本身
