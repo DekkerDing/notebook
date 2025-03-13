@@ -1,0 +1,42 @@
+JDK
+    Java标准开发包
+    它提供了编译运行Java程序所需的各种工具和资源
+    包括Java编译器
+    Java运行时环境
+    以及常用的Java类库等
+JRE
+    Java运行环境用于运行Java的字节码文件
+JVM
+    Java虚拟机是JRE的一部分
+    它是整个java实现跨平台的最核心的部分负责运行字节码文件
+
+hashCode 与 equals
+    在Java中每个对象都可以调用自己的hashCode方法得到自己的哈希值（hashCode)
+    相当于对象的指纹信息通常来说世界上没有完全相同的两个指纹
+    但是在Java中做不到这么绝对
+    但是我们仍然可以利用hashCode来做一些提前的判断
+    比如如果两个对象的hashCode不相同那么这两个对象肯定不同的两个对象
+    图如果两个对象的hashCode相同
+    不代表这两个对象一定是同一个对象也可能是两个对象
+    如果两个对象相等那么他们的hashCode就一定相同
+    所以我们就需要注意如果我们重写了equals方法
+    那么就要注意hashCode方法一定要保证能遵守上述规则
+
+String String Buffer String Builder
+    String是不可变的如果尝试去修改会新生成一个字符串对象
+    StringBuffer和StringBuilder是可变的
+    StringBuffer是线程安全的
+    StringBuilder是线程不安全的
+    所以在单线程环境下StringBuilder效率会更高
+== 与 equals
+    ==如果是基本数据类型比较是值如果是引用类型比较的是引用地址
+    equals具体看各个类重写equals方法之后的比较逻辑
+    比如String类虽然是引用类型但是String类中重写了equals方法方法内部比较的是字符串中的各个字符是否全部相等
+
+ApplicationContext和BeanFactory有什么区别
+    BeanFactory是Spring中非常核心的组件表示Bean工厂
+    可以生成Bean维护Bean而ApplicationContext继承了BeanFactory
+    所以ApplicationContext拥有BeanFactory所有的特点也是一个Bean工厂
+    但是ApplicationContext除开继承了BeanFactory之外
+    还继承了诸如EnvironmentCapable、MessageSource、ApplicationEventPublisher 等接口
+    从而ApplicationContext还有获取系统环境变量、国际化、事件发布等功能这是BeanFactory所不具备的
