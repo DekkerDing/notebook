@@ -142,3 +142,29 @@ Spring中Bean是线程安全的吗
             Bean的作用域只是表示Bean的生命周期范围
                 对于任何生命周期的Bean都是一个对象
                 这个对象是不是线程安全的还是得看这个Bean对象本身
+
+Spring 循环依赖
+    互相依赖
+    间接依赖
+    自我依赖
+        一级缓存
+            完全初始化好的Bean
+        二级缓存
+            原始的Bean对象 还没有进行赋值没有被依赖注入
+        三级缓存
+            Bean工厂对象生成原始Bean对象放入二级缓存中
+    多实例的Setter注入导致的循环依赖，需要把Bean改成单例。
+    构造器注入导致的循环依赖，可以通过@Lazy注解
+    DependsOn导致的循环依赖，找到注解循环依赖的地方，迫使它不循环依赖。
+    单例的代理对象Setter注入导致的循环依赖
+        可以使用@Lazy注解
+        或者使用@DependsOn注解指定加载先后关系
+
+过滤器 拦截器
+    过滤器
+        接收到请求之后但是在Servlet被调用之前运行的
+        只能对reguest和response进行操作
+    拦截器
+        则是在Servlet被调用之后但是在响应被发送到客户端之前来运行的
+        request、responses handler、 modelAndView.
+        exception
