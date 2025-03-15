@@ -1,3 +1,74 @@
+多线程
+    有了多线程我们就可以让程序同时做多件事情提高效率
+    只要你想让多个事情同时运行就需要用到多线程
+    比如：软件中的耗时操作、所有的聊天软件、所有的服务器
+并发
+    在同一时刻，有多个指令在单个CPU上交替执行
+并行
+    在同一时刻，有多个指令在多个CPU上同时执行
+线程创建
+    继承Thread类的方式进行实现
+    实现Runnable接口的方式进行实现
+    利用Callable接口和Future接口方式实现
+    setDaemon() 设置为守护线程
+        当其他的非守护线程执行完毕之后，守护线程会陆续结束
+    yield() 出让线程/礼让线程
+    join() 插入线程/插队线程
+        表示把设置的这个线程，插入到当前线程之前
+        当前： 看所执行的代码是运行在哪个线程上面的
+
+synchronized:
+    锁对象
+        同步代码块
+            基于 类 静态变量方式 static Object obj = new Object();
+            this： 指的是当前执行代码的线程或者对象 (不推荐使用 this 因为它不是维护这同一个锁资源对象 无法实现锁机制)
+            类名.class 指当前类 (推荐使用 能够基于JVM虚拟机 类加载特性 确保锁对象的唯一性)
+        同步方法
+            同步方法是锁住方法里面所有的代码
+            锁对象不能自己指定
+                非静态的方式  他的锁对象是 this 指的是当前执行代码的线程或者对象
+                静态的方式 当前类的字节码文件对象 类名.class
+
+等待/唤醒
+    wait() 当前线程等待，直到被其他线程唤醒
+    notify() 随机唤醒单个线程
+    notifyAll() 唤醒所有线程
+    阻塞队列
+        ArrayBlockingQueue 底层是数组 有界
+        LinkedBlockingQueue 底层是链表，无界但不是真正的无界最大为int的最大值
+
+线程状态
+    新建
+        创建线程对象  Thread thread = new Thread()
+    就绪
+        等待 CPU 分配时间片 start()
+    死亡
+        run 方法执行完毕
+    阻塞
+        锁 阻塞
+        程序操作运行阻塞
+    等待/唤醒
+        wait()
+        notify()
+        notifyAll()
+    计时等待
+        sleep()
+
+线程池
+    任务拒绝策略
+        ThreadPoolExecutor.AbortPolicy
+            默认策略： 丢弃任务并抛出RejectedExecutionException异常
+        ThreadPoolExecutor.DiscardPolicy
+            丢弃任务，但是不抛出异常这是不推荐的做法
+        ThreadPoolExecutor.DiscardoldestPolicy
+            抛弃队列中等待最久的任务然后把当前任务加入队列中
+        ThreadPoolExecutor.CallerRunsPolicy
+            调用任务的run()方法绕过线程池直接执行
+    工作流程
+        1. 当核心线程满时，再提交任务就会排队
+        2. 当核心线程满，队列满时，会 查看设置的最大线程数 创建临时线程
+        3. 当核心线程满，队列满，临时线程满时，会触发任务拒绝策略
+
 线程安全指的是
     我们写的某段代码在多个线程同时执行这段代码时，不会产生混乱
     依然能够得到正常的结果
