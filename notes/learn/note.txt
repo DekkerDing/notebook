@@ -69,6 +69,44 @@ synchronized:
         2. 当核心线程满，队列满时，会 查看设置的最大线程数 创建临时线程
         3. 当核心线程满，队列满，临时线程满时，会触发任务拒绝策略
 
+CompletableFuture
+    Completionstage 提供了更高级的功能和更好的可组合性。
+    它是Java8中引l入的，作为java.util.con current 包的一部分。
+    Completionstage 允许你以声明式的方式组合和链接异步操作，而不需要显式地处理回调函数。
+    CompletableFuture的内部使用了基于ForkJoinPool的线程池，这种线程池可以高效地调度和执行任务。
+    CompletableFuture的非阻塞特性得益于其对任务完成的监听机制。
+    当任务完成时，它会遍历所有注册的回调函数，并在合适的线程中执行这些回调。
+    通过这种机制，CompletableFuture能够在任务完成后及时返回结果或触发后续处理逻辑而不会阻塞主线程的执行。
+    supplyAsync(Supplier<T> supplier)
+        异步执行一个Supplier函数，并返回一个表示其结果的 CompletableFuture。
+    runAsync(Runnable runnable)
+        异步执行一个Runnable，不返回任何结果。
+    thenApply(Function<T, U> function)
+        当前Future 完成后，对其结果应用给定函数，并返回新的 CompletableFuture。
+    thenAccept(consumer<T> action)
+        当前 Future 完成后，对结果应用给定的 Consumer，不返回新值。
+    thenRun(Runnable action)
+        当前 Future 完成后，执行给定的 Runnable，不关心当前Future 的结果。
+    thenCompose(Function<T, CompletableFuture< U>> function)
+        当前Future 完成后，将结果传递给另一个 CompletableFuture 作为输入。
+    handle(BiFunction<T, Throwable, U> fn)
+        处理当前Future 的结果或异常，并允许返回一个新结果。
+    exceptionally(Function<Throwable, U> fn)
+        指定当当前Future遇到异常时应采取的操作。
+    complete(U value)
+        显式地完成当前Future，设置其结果为给定值。
+    completeExceptionally(Throwable ex)
+        显式地完成当前Future，设置其异常为给定异常。
+    isDone()
+        判断当前Future是否已完成。
+    isCompletedExceptionally()
+        判断当前Future是否因异常而完成。
+    get()
+        阻塞并等待当前Future 完成，然后返回结果。如果完成时出现异常，则抛出异常。
+    get(long timeout, TimeUnit unit)
+        在指定时间内阻塞并等待当前Future 完成，然后返回结果。如果超时或完成时出现异常，则抛出异常。
+
+
 线程安全指的是
     我们写的某段代码在多个线程同时执行这段代码时，不会产生混乱
     依然能够得到正常的结果

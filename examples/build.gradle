@@ -6,12 +6,11 @@ plugins {
     id "maven-publish"
     id 'org.springframework.boot' version '2.6.14'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.jetbrains.kotlin.jvm' version '2.1.10'
 }
 
 group = 'io.github.DekkerDing'
 version = '1.0-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
 compileJava.options.encoding "UTF-8"
 compileTestJava.options.encoding "UTF-8"
 
@@ -40,14 +39,20 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.14'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
+    implementation 'org.springframework.boot:spring-boot-starter-aop:2.6.14'
 // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
 }
 
@@ -93,4 +98,7 @@ idea {
         languageLevel = "1.8"
         vcs = "Git"
     }
+}
+kotlin {
+    jvmToolchain(8)
 }
