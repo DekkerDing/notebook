@@ -34,11 +34,10 @@ public class PortalController {
 
     /**
      * 并行执行
-     *
+     * <p>
      * A B C
      * -----
      * 执行其他
-     *
      */
     public void case2() throws ExecutionException, InterruptedException {
         CompletableFuture<Object> memberServiceCompletableFuture = CompletableFuture.supplyAsync(() -> memberService.search());
@@ -56,11 +55,11 @@ public class PortalController {
     }
 
     /**
-     *      A
-     *     / \
-     *    B  C
-     *    ------
-     *    执行其他
+     * A
+     * / \
+     * B  C
+     * ------
+     * 执行其他
      */
     public void case3() throws ExecutionException, InterruptedException {
 
@@ -82,11 +81,11 @@ public class PortalController {
     }
 
     /**
-     *  A B
-     *    |
-     *    C
-     *  ------
-     *  执行其他
+     * A B
+     * |
+     * C
+     * ------
+     * 执行其他
      */
     public void case4() throws ExecutionException, InterruptedException {
         CompletableFuture<Object> memberServiceCompletableFuture = CompletableFuture.supplyAsync(() -> memberService.search());
@@ -96,10 +95,22 @@ public class PortalController {
             // product = 上一步处理结果
             return orderService.search();
         });
-        CompletableFuture.allOf(memberServiceCompletableFuture,orderServiceCompletableFuture);
+        CompletableFuture.allOf(memberServiceCompletableFuture, orderServiceCompletableFuture);
 
         log.info(String.valueOf(memberServiceCompletableFuture.get()));
         log.info(String.valueOf(orderServiceCompletableFuture.get()));
         log.info(String.valueOf(productServiceCompletableFuture.get()));
+    }
+
+    public void case5() throws ExecutionException, InterruptedException {
+        CompletableFuture<Object> memberServiceCompletableFuture = CompletableFuture.supplyAsync(() -> memberService.search());
+        CompletableFuture<Object> orderServiceCompletableFuture = CompletableFuture.supplyAsync(() -> orderService.search());
+
+        CompletableFuture<String> resoult = memberServiceCompletableFuture.thenCombine(orderServiceCompletableFuture, (member, order) -> {
+            // 返回值运算 处理
+            return "resoult : " + member + "," + order;
+        });
+
+        log.info(String.valueOf(resoult.get()));
     }
 }

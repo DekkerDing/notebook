@@ -30,4 +30,9 @@ public class PortalControllerTest {
     public void case4() throws ExecutionException, InterruptedException {
         portalController.case4();
     }
+
+    @Test
+    public void case5() throws ExecutionException, InterruptedException {
+        portalController.case5();
+    }
 }

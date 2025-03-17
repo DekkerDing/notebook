@@ -81,20 +81,31 @@ CompletableFuture
         异步执行一个Supplier函数，并返回一个表示其结果的 CompletableFuture。
     runAsync(Runnable runnable)
         异步执行一个Runnable，不返回任何结果。
+    thenAsync(Function<T, U> function)
+        会利用CompletableFuture中公共的ForkJoinPool来执行任务
     thenApply(Function<T, U> function)
-        当前Future 完成后，对其结果应用给定函数，并返回新的 CompletableFuture。
+        当前Future 完成后，对其结果应用给定函数，并返回新的 CompletableFuture 有入参，有返回值
     thenAccept(consumer<T> action)
-        当前 Future 完成后，对结果应用给定的 Consumer，不返回新值。
+        当前 Future 完成后，对结果应用给定的 Consumer，不返回新值 有入参，无返回值
     thenRun(Runnable action)
-        当前 Future 完成后，执行给定的 Runnable，不关心当前Future 的结果。
+        当前 Future 完成后，执行给定的 Runnable，不关心当前Future 的结果 无入参，无返回值
     thenCompose(Function<T, CompletableFuture< U>> function)
-        当前Future 完成后，将结果传递给另一个 CompletableFuture 作为输入。
+        当前Future 完成后，将结果传递给另一个 CompletableFuture 作为输入 有入参，有返回值，返回值类型只能是CompletionStage
+        按顺序执行两个并行任务
+    thenCombine CompletionStage<?extends U>other,BiFunction<?super T,?super U,?extendsV>fn
+        第一个参数为CompletionStage
+        第二个参数为具体要执行的任务，认为类型为BiFunction，有两个入参，一个返回值
+        整合两个并行执行的任务结果
+    runAfterEither
+        两个任务中任意一个完成了，就执行回调
+    runAfterBoth
+        两个任务都完成了，才执行回调
     handle(BiFunction<T, Throwable, U> fn)
         处理当前Future 的结果或异常，并允许返回一个新结果。
     exceptionally(Function<Throwable, U> fn)
         指定当当前Future遇到异常时应采取的操作。
     complete(U value)
-        显式地完成当前Future，设置其结果为给定值。
+        显式地完成当前Future，设置其结果为给定值 直接让任务完成
     completeExceptionally(Throwable ex)
         显式地完成当前Future，设置其异常为给定异常。
     isDone()
@@ -105,7 +116,25 @@ CompletableFuture
         阻塞并等待当前Future 完成，然后返回结果。如果完成时出现异常，则抛出异常。
     get(long timeout, TimeUnit unit)
         在指定时间内阻塞并等待当前Future 完成，然后返回结果。如果超时或完成时出现异常，则抛出异常。
-
+    T getNow(T valuelfAbsent)
+        立即获取结果，如果任务还没完成，则返回valuelfAbsent
+    whenComplete
+        入参为BiConsumer<？superT,？superThrowable> action
+        任务正常结束第一个参数传入的是结果
+        任务异常结束第二个参数传入的是异常 异常类型是CompletionException
+        没有返回值
+    exceptionally
+        入参为Function<Throwable，？extendsT> fn
+        入参为异常 异常类型是CompletionException
+        可以返回其他值
+        如果任务没有出现异常则不会执行
+    cancel
+        如果任务还没开始，或正在执行，则能取消，设置取消标记为 true
+        如果任务已经完成，则设置取消标记为 false
+    allOf
+        所有任务都执行完后才执行下一个任务
+    anyOf
+        任意一个任务执行完就可以执行下一个任务了
 
 线程安全指的是
     我们写的某段代码在多个线程同时执行这段代码时，不会产生混乱
