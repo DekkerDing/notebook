@@ -790,6 +790,64 @@
 
 
 Mapping 映射
+    参数
+        index
+            是否对创建对当前字段创建倒排索引
+            默认true，如果不创建索引该字段不会通过索引被搜索到
+            但是仍然会在source元数据中展示
+        analyzer
+            指定分析器（characterfilter、tokenizer、Tokenfilters）
+        boost:
+            对当前字段相关度的评分权重，默认1
+        coerce
+            是否允许强制类型转换 true “1” => 1 false “1” =< 1
+        copy_to
+            该参数允许将多个字段的值复制到组字段中，然后可以将其作为单个字段进行查询
+        doc_values
+            为了提升排序和聚合效率，默认true
+            如果确定不需要对字段进行排序或聚合
+            也不需要通过脚本访问字段值
+            则可以禁用doc值以节省磁盘空间（不支持 text 和 annotated_text ）
+        eager_global_ordinals
+            用于聚合的字段上，优化聚合性能
+        Frozen indices（冻结索引）
+            有些索引使用率很高
+            会被保存在内存中
+            有些使用率特别低宁愿在使用的时候重新创建
+            在使用完毕后丢弃数据，Frozen indices 的数据命中频率小
+            不适用于高搜索负载数据不会被保存在内存中
+            堆空间占用比普通索引少得多 Frozen indices 是只读的
+            请求可能是秒级或者分钟级
+            *eager_global_ordinals 不适用于 Frozen indices
+        enable
+            是否创建倒排索引
+            可以对字段操作也可以对索引操作
+            如果不创建索引
+            让然可以检索并在_source元数据中展示
+            谨慎使用，该状态无法修改
+            fielddata：查询时内存数据结构
+            在首次用当前字段聚合
+            排序或者在脚本中使用时
+            需要字段为fielddata数据结构
+            并且创建倒排索引保存到堆中
+        ignore_above
+            超过长度将被忽略
+        index_options
+            控制将哪些信息添加到反向索引引中以进行搜索和突出显示 仅用于text字段
+        Index_prefixes 前缀搜索
+            minchars
+                前缀最小长度，>0，默认2（包含）
+            max_chars
+                前缀最大长度，<20，默认5（包含）
+        norms
+            是否禁用评分（在filter和聚合字段上应该禁用）
+        nullvalue
+            为null值设置默认值**
+        store
+            设置字段是否仅查询
+        similarity
+            为字段设置相关度算法，支持BM25、claassic（TF-IDF）、boolean
+
     查看:
         GET /es_index/_mapping
     显示设置
@@ -862,36 +920,38 @@ Mapping 映射
         long 表示数值
         integer 表示数值
         double 表示浮点数
+        alias 为现有字段定义别名
         binary
-        object
+        join 为同一索引中的文档定义父/子关系
+        object 用于单个JSON对象
         nested 表示一个对象数组
             如果实体类中存在集合类型的属性
             那么此时就需要将该属性的类型设置为Nested类型
             如果不设置为Nested类型ES会对该属性进行扁平化处理一旦进行了扁平化处理那么此时在搜索的时候就会出现问题
-        Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序
+        Keyword 对值的准确匹配主要用于准确匹配/过滤/聚合/排序 不分词
             用于id 枚举及不需要分词的文本 例如电话号码 email地址 手机号码 邮政编码 性别等
             适用于 Filter (精确匹配） Sorting 和 Aggregations
                 constant_keyword
                 wildcard
         text 表示文本信息 字符串值 无结构数据
-        用于全文本字段 文本会被Analyzer分词
-        默认不支持聚合分析及排序 需要设置fielddata为true
-        默认会为文本类型设置成text 并且设置一个keyword的子字段
-        如不需要检索 排序和聚合分析 Enable设置成false
-        如不需要排序或者聚合分析功能
-        Doc_values/fielddata设置成false
-        如不需要检索 Index设置成false
-        对需要检索的字段 可以通过如下配置 设定存储粒度
-        Index_options / Norms ： 不需要归一化数据时 可以关闭
-        更新频繁 聚合查询频繁的keyword类型的字段
-        推荐将 eager alobal ordinals设置为 true
-            search_as_you_type
-            match_only_text
-            completion
-            token_count
-            etc
-        geo_point
-        geo_shape
+            用于全文本字段 文本会被Analyzer分词
+            默认不支持聚合分析及排序 需要设置fielddata为true
+            默认会为文本类型设置成text 并且设置一个keyword的子字段
+            如不需要检索 排序和聚合分析 Enable设置成false
+            如不需要排序或者聚合分析功能
+            Doc_values/fielddata设置成false
+            如不需要检索 Index设置成false
+            对需要检索的字段 可以通过如下配置 设定存储粒度
+            Index_options / Norms ： 不需要归一化数据时 可以关闭
+            更新频繁 聚合查询频繁的keyword类型的字段
+            推荐将 eager alobal ordinals设置为 true
+                search_as_you_type
+                match_only_text
+                completion
+                token_count
+                etc
+        geo_point 纬度/经度积分
+        geo_shape 用于多边形等复杂形状
         percolator
 
 聚合分析
@@ -1103,3 +1163,113 @@ Transform
             }
         }
     }
+
+查询类型
+    Query DSL
+        全文检索
+        Query String
+            简单查询
+            不依赖于特定客户端
+        Fulltext Query
+            全文检索
+        Term Query
+            精确查询
+        Filter
+            过滤器
+        Bool Query
+            组合查询
+            minimum_should_match
+                参数指定should返回的文档必须匹配的子句的数量或百分比
+                如果bool查询包含至少一个should子句
+                而没有must或filter子句
+                则默认值为1 否则，默认值为0
+    Script
+        自定义可编程查询
+    Aggregations
+        数据分析
+    SQL
+        以SQL语音适配查询
+    EQL 事件查询
+
+写入原理
+    segment
+        每一个 倒排索引 创建都会生成 segment 文件
+        .del File
+        partial update
+        delete
+    refresh
+        刷新以后数据 进入到 系统缓存此时才能提供页面查询
+        可配置
+        refresh 动作是在 JVM 里
+    Commit Point
+        基于配置 预值阈值 数据 segment 文件 提交到本地物理内存
+        1：选择相似segment合并merge
+        2:flush操作
+        3：创建新的 commint point 标记新的 segment 删除旧的标记
+        4:将新的segment搜索状态打开
+        5：删除旧的segment文件
+    OS Cache
+        物理内存
+    fsync
+    Buffer
+        写入的数据最先进入 Buffer 进行缓存排序
+    translog
+        类型于Mysql redo 日志 防止系统断电 内存数据丢失
+        refresh 刷新时触发
+        触发flush
+            当文件大小达到國值或者一定时间 （默认30分钟）
+            1:commit
+            1:fsync
+            2：清空translog
+    尽量使用bulk批量写入
+    增加flush时间间隔，目的是减小数据写入磁盘的频率，减小磁盘lO
+    增加rfresh_interval的参数值，目的是减少segment文件的创建，减少segment的merge次数
+        merge是发生在jvm中的，有可能导致fullGC，增加refresh会降低搜索的实时性。
+    增加Buffer大小，本质也是减小refresh的时间间隔，因为导致segment文件创建的原因不仅有时间阈值
+        还有buffer空间大小，写满了也会创建。默认最小值48MB<默认值堆空间的10%<默认最大无限制
+    大批量的数据写入尽量挫制在低检索请求的时间段，大批量的写入请求越集中越好。
+        第一是减小读写之间的资源抢占，读写分离
+        第二，当检索请求数量很少的时候，可以减少甚至完全删除副本分片
+        关闭segment的自动创建以达到高效利用内存的目的
+        因为副本的存在会导致主从之间频繁的进行数据同步
+        大大增加服务器的资源占用。
+    Lucene的数据的fsync是发生在OScache的，要给OScache预留足够的内从大小，详见JvM调优。
+    通用最小化算法，能用更小的字段类型就用更小的，keyword类型比int更快
+    ignore_above：字段保留的长度，越小越好
+    调整_source字段，通过include和exclude过滤
+    store：开辟另一块存储空间，可以节省带宽
+    禁用all字段
+        al字段的包含所有字段分词后的Term，作用是可以在搜索时不指定特定字段，从所有字段中检索，ES6.0之前需要手动关闭
+    关闭Norms字段
+        计算评分用的，如果你确定当前字段将来不需要计算评分
+        设置false可以节省大量的磁盘空间，有助于提升性能。
+        常见的比如filter和agg字段，都可以设为关闭。
+    关闭index_options（谨慎使用，高端操作）
+        词设置用于在indextime过程中哪些内容会被添加到倒排索引l的文件中，例如TF，
+        docCount、postion、offsets等
+        减少option的选项可以减少在创建索引I时的cPU占用率
+        不过在实际场景中很难确定业务是否会用到这些信息
+        除非是在一开始就非常确定用不到否则不建议删除
+
+搜索速度调优
+    使用filter代替query
+    避免深度分页，避免单页数据过大，可以参考百度或者淘宝的做法。
+    es提供两种解决方案 scrollsearch 和 searchafter 注意关于 index type 的使用
+    避免使用稀疏数据
+    冷热分离的架构设计
+    fielddata：搜索时正排索引，doc_value为indextime正排索引l
+    enabled：是否创建倒排索引
+    doc_values：正排索引，
+    对于不需要聚合的字段，关闭正排索引|可节省资源，
+    提高查询速度开启自适应副本选择（ARS），6.1版本支持，7.0默认开启，
+
+节点类型
+    master：候选节点
+    data：数据节点
+    data_content：数据内容节点
+    data_hot:热节点
+    data_warm：索引|不再定期更新，但仍可查询
+    data_code：冷节点，只读索引
+    Ingest：预处理节点，作用类似于Logstash中的Filter ml：机器学习节点
+    remote_cluster_client：候选客户端节点 transform：转换节点
+    voting_only：仅投票节点
