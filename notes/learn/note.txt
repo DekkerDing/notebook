@@ -83,6 +83,43 @@ Spring事务什么时候会失效？
         3、数据库不支持事务
         4、没有被spring管理
         5、异常被吃掉，事务不会回滚（或者抛出的异常没有被定义，默认为RuntimeException)
+        1．方法内的自调用：Spring事务是基于AOP的
+            只要使用代理对象调用某个方法时Spring事务才能生效
+            而在一个方法中调用使用this.xxO调用方法时
+            this并不是代理对象
+            所以会导致事务失效。
+            a．解放办法1：
+                把调用方法拆分到另外一个Bean中图买字
+            b.解决办法2：
+                自己注入自己
+            c.解决办法3:
+                AopContext.currentProxyO+@EnableAspectAutoProxy(exposeProxy=true)
+        2.方法是private的：Spring事务会基于CGLIB来进行AOP
+            而CGLIB会基于父子类来失效
+            子类是代理类 父类是被代理类
+            如果父类中的某个方法是private的，那么子类就没有办法重写它
+            也就没有办法额外增加Spring事务的逻辑。
+        3.方法是final的：原因和private是一样的，也是由于子类不能重写父类中的final的方法
+        4.单独的线程调用方法：
+            当Mybatis或JdbcTemplate执行SQL时
+            会从ThreadLocal中去获取数据库连接对象
+            如果开启事务的线程和执行SQL的线程是同一个
+            那么就能拿到数据库连接对象
+            如果不是同一个线程那就拿到不到数据库连接对象
+            这样，Mybatis或JdbcTemplate就会自己去新建一个数据库连接用来执行SQL
+            此数据库连接的autocommit为true，那么执行完SQL就会提交
+            后续再抛异常也就不能再回滚之前已经提交了的SQL了。
+        5.没加@Configuration注解：
+            如果用SpringBoot基本没有这个问题，但是如果用的Spring，那么可能会有这个问题
+            这个问题的原因其实也是由于Mybatis或JdbcTemplate会从ThreadLocal中去获取数据库连接
+            但是ThreadLocal中存储的是一个MAP
+            MAP的key为DataSource对象value为连接对象，而如果我们没有在AppConfig上添加@Configuration注解的话
+            会导致MAP中存的DataSource对象和Mybatis和JdbcTemplate中的DataSource对象不相等
+            从而也拿不到数据库连接
+            导致自己去创建数据库连接了。
+        6．异常被吃掉：如果Spring事务没有捕获到异常，那么也就不会回滚了，默认情况下Spring会捕获RuntimeException和Error。
+        7.类没有被Spring管理
+        8.数据库不支持事务
 
 BeanFactory 与 FactoryBean
 
