@@ -232,3 +232,12 @@ Explain
     filtered 表示符合查询条件的数据百分比
         表示符合查询条件的数据百分比。可以使用rows*filtered/100计算出与explain前一个表进行连接的行数。
     Extra SQL执行的额外信息
+
+脏页 check point
+    脏页现象： Mysql 内存占存的数据与磁盘比较不一致
+    什么时候触发checkpoint：
+        masterthread：每一秒或者每十秒刷写脏页
+        bufferpool；innodb_Iru_scan_depth|1024；如果低于指定空闲页，将触发checkpoint。
+        重做日志不可用，将触发checkpoint
+        buffer pool；innodb_max_dirty_pages_pct丨75.000000；如果超过指定75%，将触发checkpoint。
+        innodb_fast_shutdown|1；如果关闭数据库将bufferpool中所有的脏页全部刷写到磁盘
