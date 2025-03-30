@@ -157,6 +157,23 @@ binlog redolog undolog relaylog
         2.多版本并发控制（MVcC)：结合ReadView机制，利用undolog实现多版本并发控制，从而支持高并发读写操作。
     relaylog
 
+    redolog 与 binlog
+        binlog
+            数据备份
+            数据恢复
+            主从集群的数据同步
+            记录数据库的逻辑变化
+            binlog是在执行SQL语句的时候在主线程生成逻辑变化写入到磁盘里面
+            所以它是语句级别的记录方式
+        redolog
+            实现Mysql数据库的事务恢复
+            保证事务的 ACID特性
+                当数据库现崩溃时 RedoLog可以把未提交的事务回滚，把已提交的事务进行持久化
+            记录的是物理变化 数据页的变化结果
+            是在InnoDB存储引擎层面的操作它是在Mysgl后台线程中去生成并且写入到磁盘中的
+            所以它是事务级别的记录方式
+            一个事务操作完成以后才会被写入到redolog里面
+
 运维
     通过show processlist 去查询当前的会话情况确定是否有消耗资源的SQL正在运行
 
