@@ -7,3 +7,19 @@ case 1:
                 3. 实现校验管理器 Manager
                 3.1 获取 Spring 所有  PapersValidateInterface 实现 Bean 映射成 Map 对象
                 3.2 循环 遍历进行条件校验过滤
+
+责任链模式原始定义
+    通过为多个对象提供处理请求的机会，避免将请求的发送者与其接收者耦合链接接收对象并沿着链传递请求，直到对象处理它
+    通过构建一个处理流水线来对一次请求进行多次的处理
+结构
+    (Handler)处理类
+        可以是一个接口，用于接收请求并将请求分派到处理程序链条中（实际上就是一个数组链表）会先将链中的第一个处理程序放入开头来处理
+    具体处理类
+        按照链条顺序对请求进行具体处理
+原理
+
+预期
+
+
+资料
+    https://www.bilibili.com/video/BV1hY411Y7zR?spm_id_from=333.788.videopod.episodes&vd_source=afc578e8acd436b9b937b4fb9a3c7095&p=31
