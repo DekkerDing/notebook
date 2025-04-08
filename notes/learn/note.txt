@@ -953,7 +953,11 @@ Mapping 映射
         geo_point 纬度/经度积分
         geo_shape 用于多边形等复杂形状
         percolator
-
+multi-fields
+    通过 multi-fields 设置
+    可以轻松实现同一个字段既能支持分词查询，又能支持精确查询。
+    主字段使用 text 类型，子字段使用 keyword 类型
+    查询时根据需要选择对应的字段即可。
 聚合分析
     Bucket Aggregation 列满足特定条件的文档的集合
         类似于 GROUP by
