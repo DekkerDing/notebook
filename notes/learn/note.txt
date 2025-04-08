@@ -265,3 +265,16 @@ Explain
         重做日志不可用，将触发checkpoint
         buffer pool；innodb_max_dirty_pages_pct丨75.000000；如果超过指定75%，将触发checkpoint。
         innodb_fast_shutdown|1；如果关闭数据库将bufferpool中所有的脏页全部刷写到磁盘
+
+深度分页
+    MYSQL需要扫描m条记录并跳过这个偏量m才能将你想要的n条记录返回给你m值越大那么扫描的记录就会越多
+    依托于 B+Tree Where id > xxx limit 0,xxx
+    子查询 + 覆盖索引
+        where c.id >= （select id from xxx ORDER BY id Limit #{offset},1） Limit #{pageSize};
+    内连接（innerjoin）
+        查询，我们可以把子查询（利用聚集索引l)的结果当成一张临时表，然后和原表进行关联查询
+        FROM xxx c，
+        (SELECT id where FROM xxx WHERE ORDER BY id LIMIT #{offset}，#{pageSize}) as d
+        c.id = d.id;
+    使用游标分页查询，当我们查询第二页的时候，把第一页的查询结果（返回最后一条记录的Id)放到第二页的查询条件中
+        FROM xxx WHERE id >#{lastId} order by c.id limit #{pageSize};
