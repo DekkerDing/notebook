@@ -247,6 +247,12 @@ Mybatis
         $是字符串替换、是拼接符
         Mybatis在处理$时，会将sql中的$替换成变量的值，调用Statement来赋值；
 
+Mybatis中的一级缓存 二级缓存
+    一级缓存
+        SglSession级别 就是一次查询一次事务就认为是一个SqlSession缓存结果在这个过程中是共享的只在一次数据库的事务里面有效
+    二级缓存
+        整个mapper的这个命名空间不管你是哪一次的事务产生的从一次会话的这个结果共享变成了所有的会话的结果共享
+
 CountDownLatch 和 Semaphore的区别和底层原理
     CountDownLatch表示计数器，可以给CountDownLatch设置一个数字
     一个线程调用CountDownLatch的await将会阻塞
@@ -578,3 +584,4 @@ LinkedHashSet
     底层维护了一个数组+双向链表
     LinkedHashSet根据元素的hashCode值来决定元素的存储位置，同时使用链表维护元素的次序
     这使得元素看起来是以插入顺序保存的
+JAVA 泛型擦除
