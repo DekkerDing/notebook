@@ -808,3 +808,5 @@ linux内存分配策略
         echo1>/proc/sys/vm/overcommit_memory
 
 QPS
+
+集群主从
