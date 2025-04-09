@@ -114,6 +114,7 @@ KEY命名
             移除元素，可以指定移除个数 (类似于去重)
             LREM KEY COUNT VALUE
     Hash
+        key：[{field：value}]
         是一个string类型的field和value的映射表 hash特别适合用于存储对象
         每个hash可以存储232-1键值对（40多亿）
         应用场景
@@ -145,6 +146,7 @@ KEY命名
             设置key指定的哈希集中指定字段的值
             HMGET key field [field ...]
     Set
+        Set集合
         将一个或多个成员元素加入到集合中，已经存在于集合的成员元素将被忽略
         集合是通过哈希表实现的
         应用场景
@@ -810,3 +812,4 @@ linux内存分配策略
 QPS
 
 集群主从
+    各个节点会互相通信，采用gossip协议交换节点元数据信息
