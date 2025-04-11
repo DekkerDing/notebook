@@ -810,6 +810,14 @@ linux内存分配策略
         echo1>/proc/sys/vm/overcommit_memory
 
 QPS
+同步
+    主从第一次同步是全量同步，但如果slave重启后同步，则执行增量同步
+    全量同步
+        bg save 发生RDB 文件
+    增量同步
+        repl_baklog
+
+
 
 集群主从
     各个节点会互相通信，采用gossip协议交换节点元数据信息
