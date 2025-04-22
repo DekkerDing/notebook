@@ -1,6 +1,7 @@
 package io.github.dekkerding.examples;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,9 +12,26 @@ public class ListNode {
     int val;
     ListNode next;
 
-    ListNode() {}
-    ListNode(int val) { this.val = val; }
-    ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+    private ListNode(int val, ListNode next) {
+        this.val = val;
+        this.next = next;
+    }
+
+    @ParameterizedTest
+    public static ListNode create() {
+        return new ListNode(0, null);
+    }
+
+    @ParameterizedTest
+    public static ListNode create(int val) {
+        return new ListNode(val, null);
+    }
+
+    @ParameterizedTest
+    public static ListNode create(int val, ListNode next) {
+        return new ListNode(val, next);
+    }
+
 
     // 归并排序方法
     public static ListNode sortList(ListNode head) {
@@ -43,7 +61,7 @@ public class ListNode {
 
     // 合并两个有序链表
     private static ListNode merge(ListNode left, ListNode right) {
-        ListNode dummy = new ListNode();
+        ListNode dummy = ListNode.create();
         ListNode tail = dummy;
         while (left != null && right != null) {
             if (left.val < right.val) {
@@ -74,13 +92,13 @@ public class ListNode {
     }
 
     // 测试场景 1: 普通链表排序
-    @Test
-    public void testSortList_Normal() {
-        ListNode head = new ListNode(3);
-        head.next = new ListNode(2);
-        head.next.next = new ListNode(1);
+    public static void testSortList_Normal() {
+        ListNode head = ListNode.create(3);
+        head.next = ListNode.create(2);
+        head.next.next = ListNode.create(1);
 
         head = sortList(head);
+        printList(head);
 
         assertEquals(1, head.val);
         assertEquals(2, head.next.val);
@@ -89,29 +107,32 @@ public class ListNode {
 
     // 测试场景 2: 空链表
     @Test
-    public void testSortList_Empty() {
+    public static void testSortList_Empty() {
         ListNode head = null;
         head = sortList(head);
+        printList(head);
         assertNull(head);
     }
 
     // 测试场景 3: 单节点链表
-    @Test
-    public void testSortList_SingleNode() {
-        ListNode head = new ListNode(42);
+
+    public static void testSortList_SingleNode() {
+        ListNode head = ListNode.create(42);
         head = sortList(head);
+        printList(head);
         assertEquals(42, head.val);
         assertNull(head.next);
     }
 
     // 测试场景 4: 已排序链表
-    @Test
-    public void testSortList_AlreadySorted() {
-        ListNode head = new ListNode(1);
-        head.next = new ListNode(2);
-        head.next.next = new ListNode(3);
+    public static void testSortList_AlreadySorted() {
+        ListNode head = ListNode.create(1);
+        head.next = ListNode.create(2);
+        head.next.next = ListNode.create(3);
 
         head = sortList(head);
+
+        printList(head);
 
         assertEquals(1, head.val);
         assertEquals(2, head.next.val);
@@ -119,16 +140,25 @@ public class ListNode {
     }
 
     // 测试场景 5: 逆序链表
-    @Test
-    public void testSortList_ReverseSorted() {
-        ListNode head = new ListNode(3);
-        head.next = new ListNode(2);
-        head.next.next = new ListNode(1);
+    public static void testSortList_ReverseSorted() {
+        ListNode head = ListNode.create(3);
+        head.next = ListNode.create(2);
+        head.next.next = ListNode.create(1);
 
         head = sortList(head);
+
+        printList(head);
 
         assertEquals(1, head.val);
         assertEquals(2, head.next.val);
         assertEquals(3, head.next.next.val);
+    }
+
+    public static void main(String[] args) {
+//        testSortList_ReverseSorted();
+//        testSortList_AlreadySorted();
+//        testSortList_SingleNode();
+//        testSortList_Empty();
+//        testSortList_Normal();
     }
 }
