@@ -4,21 +4,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 public class Tree {
 
     // 辅助类：树节点
     static class TreeNode<T> {
-        T value;  // 节点值
-        TreeNode<T> parent;  // 父节点
-        List<TreeNode<T>> children = new ArrayList<>();  // 子节点列表
+        T value;
+        TreeNode<T> parent;
+        List<TreeNode<T>> children = new ArrayList<>();
 
         public TreeNode(T value) {
             this.value = value;
         }
 
-        // 添加子节点
         public void addChild(TreeNode<T> child) {
             child.parent = this;
             children.add(child);
@@ -35,18 +37,15 @@ public class Tree {
 
     // 辅助类：双向树节点（继承自树节点）
     static class BiDirectionalTreeNode<T> extends TreeNode<T> {
-        BiDirectionalTreeNode<T> next;  // 后继节点
-        BiDirectionalTreeNode<T> prev;  // 前驱节点
+        BiDirectionalTreeNode<T> next;
+        BiDirectionalTreeNode<T> prev;
 
         public BiDirectionalTreeNode(T value) {
             super(value);
         }
 
-        // 在BiDirectionalTreeNode类中添加以下方法
-
         /**
-         * getAllNodes方法通过广度优先遍历（BFS）收集所有节点
-         * 并返回一个包含所有节点的列表
+         * getAllNodes方法通过广度优先遍历（BFS）收集所有节点，并返回一个包含所有节点的列表
          * 这样在buildSortedBiDirectionalTree方法中就可以正确调用getAllNodes来获取所有节点并设置双向链接
          *
          * @return
@@ -71,8 +70,8 @@ public class Tree {
 
     // 辅助类：链表节点
     static class ListNode<T> {
-        T value;  // 节点值
-        ListNode<T> next;  // 指向下一个节点
+        T value;
+        ListNode<T> next;
 
         public ListNode(T value) {
             this.value = value;
@@ -81,28 +80,17 @@ public class Tree {
 
     // 辅助方法：构建树结构
     public TreeNode<Integer> buildTree(int rootValue) {
-        // 创建根节点
         TreeNode<Integer> root = new TreeNode<>(rootValue);
-
-        // 添加子节点
         root.addChild(new TreeNode<>(4));
         root.addChild(new TreeNode<>(1));
-
-        // 为第一个子节点添加孙节点
         root.children.get(0).addChild(new TreeNode<>(6));
-
-        // 为第二个子节点添加孙节点
         root.children.get(1).addChild(new TreeNode<>(2));
-
-        // 为孙节点添加曾孙节点
         root.children.get(1).children.get(0).addChild(new TreeNode<>(5));
-
         return root;
     }
 
     // 辅助方法：构建双向树结构
     public BiDirectionalTreeNode<Integer> buildBiDirectionalTree(int rootValue) {
-        // 创建各种节点
         BiDirectionalTreeNode<Integer> root = new BiDirectionalTreeNode<>(rootValue);
         BiDirectionalTreeNode<Integer> node4 = new BiDirectionalTreeNode<>(4);
         BiDirectionalTreeNode<Integer> node1 = new BiDirectionalTreeNode<>(1);
@@ -110,14 +98,12 @@ public class Tree {
         BiDirectionalTreeNode<Integer> node2 = new BiDirectionalTreeNode<>(2);
         BiDirectionalTreeNode<Integer> node5 = new BiDirectionalTreeNode<>(5);
 
-        // 构建树结构
         root.addChild(node4);
         root.addChild(node1);
         node4.addChild(node6);
         node1.addChild(node2);
         node2.addChild(node5);
 
-        // 设置双向链接
         node4.prev = root;
         node4.next = node1;
 
@@ -137,13 +123,11 @@ public class Tree {
 
     // 辅助方法：构建链表
     public ListNode<Integer> buildLinkedList(int... values) {
-        if (values.length == 0) return null;  // 如果没有值，返回空链表
+        if (values.length == 0) return null;
 
-        // 创建头节点
         ListNode<Integer> head = new ListNode<>(values[0]);
         ListNode<Integer> current = head;
 
-        // 添加后续节点
         for (int i = 1; i < values.length; i++) {
             current.next = new ListNode<>(values[i]);
             current = current.next;
@@ -154,13 +138,11 @@ public class Tree {
 
     // 辅助方法：将栈转换为树
     public TreeNode<Integer> stackToTree(Stack<Integer> stack) {
-        if (stack.isEmpty()) return null;  // 如果栈为空，返回空树
+        if (stack.isEmpty()) return null;
 
-        // 创建根节点（使用栈顶元素）
         TreeNode<Integer> root = new TreeNode<>(stack.pop());
         TreeNode<Integer> current = root;
 
-        // 依次弹出栈中元素并创建子节点
         while (!stack.isEmpty()) {
             TreeNode<Integer> newNode = new TreeNode<>(stack.pop());
             current.addChild(newNode);
@@ -172,13 +154,11 @@ public class Tree {
 
     // 辅助方法：将链表转换为树
     public TreeNode<Integer> linkedListToTree(ListNode<Integer> head) {
-        if (head == null) return null;  // 如果链表为空，返回空树
+        if (head == null) return null;
 
-        // 创建根节点（使用链表头节点值）
         TreeNode<Integer> root = new TreeNode<>(head.value);
         TreeNode<Integer> current = root;
 
-        // 遍历链表并创建树节点
         while (head.next != null) {
             TreeNode<Integer> newNode = new TreeNode<>(head.next.value);
             current.addChild(newNode);
@@ -191,13 +171,11 @@ public class Tree {
 
     // 辅助方法：将列表集合转换为树
     public TreeNode<Integer> listToTree(List<Integer> list) {
-        if (list.isEmpty()) return null;  // 如果列表为空，返回空树
+        if (list.isEmpty()) return null;
 
-        // 创建根节点（使用列表第一个元素）
         TreeNode<Integer> root = new TreeNode<>(list.get(0));
         TreeNode<Integer> current = root;
 
-        // 遍历列表并创建树节点
         for (int i = 1; i < list.size(); i++) {
             TreeNode<Integer> newNode = new TreeNode<>(list.get(i));
             current.addChild(newNode);
@@ -209,38 +187,34 @@ public class Tree {
 
     // 辅助方法：对树进行快速排序
     public void quickSortTree(TreeNode<Integer> node) {
-        if (node == null || node.children.isEmpty()) return;  // 如果节点为空或没有子节点，直接返回
+        if (node == null || node.children.isEmpty()) return;
 
-        // 统计所有节点值
         List<Integer> values = new ArrayList<>();
         collectValues(node, values);
 
-        // 快速排序
         quickSort(values);
 
-        // 重新构建树（这里简化为按排序后的值重新构建）
         TreeNode<Integer> newRoot = buildSortedTree(values);
-        node.value = newRoot.value;  // 更新根节点值
-        node.children.clear();  // 清空子节点
-        node.children.addAll(newRoot.children);  // 添加新的子节点
+        node.value = newRoot.value;
+        node.children.clear();
+        node.children.addAll(newRoot.children);
     }
 
-    // 辅助方法：收集树中所有节点值
     private void collectValues(TreeNode<Integer> node, List<Integer> values) {
-        values.add(node.value);  // 添加当前节点值
+        if (node == null) return;
+        values.add(node.value);
         for (TreeNode<Integer> child : node.children) {
-            collectValues(child, values);  // 递归添加子节点值
+            collectValues(child, values);
         }
     }
 
-    // 辅助方法：对列表进行快速排序
     private void quickSort(List<Integer> list) {
-        if (list.size() <= 1) return;  // 如果列表长度小于等于1，直接返回
+        if (list.size() <= 1) return;
 
-        int pivot = list.get(list.size() / 2);  // 选择中间元素作为基准
-        List<Integer> less = new ArrayList<>();  // 存储小于基准的元素
-        List<Integer> equal = new ArrayList<>();  // 存储等于基准的元素
-        List<Integer> greater = new ArrayList<>();  // 存储大于基准的元素
+        int pivot = list.get(list.size() / 2);
+        List<Integer> less = new ArrayList<>();
+        List<Integer> equal = new ArrayList<>();
+        List<Integer> greater = new ArrayList<>();
 
         for (int num : list) {
             if (num < pivot) less.add(num);
@@ -248,11 +222,9 @@ public class Tree {
             else equal.add(num);
         }
 
-        // 递归排序子列表
         quickSort(less);
         quickSort(greater);
 
-        // 合并排序后的列表
         List<Integer> sorted = new ArrayList<>();
         sorted.addAll(less);
         sorted.addAll(equal);
@@ -261,15 +233,263 @@ public class Tree {
         list.addAll(sorted);
     }
 
-    // 辅助方法：根据排序后的值构建树
-    private TreeNode<Integer> buildSortedTree(List<Integer> sortedValues) {
-        if (sortedValues.isEmpty()) return null;
+    /**
+     * 快速排序优化
+     *
+     * @param list
+     */
+    private void randomQuickSort(List<Integer> list) {
+        if (list.size() <= 1) return;
 
-        // 创建根节点（使用第一个排序值）
+        // 随机选择基准值
+        int pivotIndex = new Random().nextInt(list.size());
+        int pivot = list.get(pivotIndex);
+
+        List<Integer> less = new ArrayList<>();
+        List<Integer> equal = new ArrayList<>();
+        List<Integer> greater = new ArrayList<>();
+
+        for (int num : list) {
+            if (num < pivot) less.add(num);
+            else if (num > pivot) greater.add(num);
+            else equal.add(num);
+        }
+
+        randomQuickSort(less);
+        randomQuickSort(greater);
+
+        list.clear();
+        list.addAll(less);
+        list.addAll(equal);
+        list.addAll(greater);
+    }
+
+    /**
+     * 广度优先排序（BFS
+     * 广度优先排序可以按层级对树节点进行排序
+     *
+     * @param root
+     */
+    public void bfsSortTree(TreeNode<Integer> root) {
+        if (root == null) return;
+
+        List<Integer> values = new ArrayList<>();
+        Queue<TreeNode<Integer>> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode<Integer> node = queue.poll();
+            values.add(node.value);
+            for (TreeNode<Integer> child : node.children) {
+                queue.add(child);
+            }
+        }
+
+        Collections.sort(values);
+        rebuildTree(root, values);
+    }
+
+    private void rebuildTree(TreeNode<Integer> root, List<Integer> sortedValues) {
+        if (root == null || sortedValues.isEmpty()) return;
+
+        Queue<TreeNode<Integer>> queue = new LinkedList<>();
+        queue.add(root);
+
+        int index = 0;
+        while (!queue.isEmpty()) {
+            TreeNode<Integer> node = queue.poll();
+            node.value = sortedValues.get(index++);
+            for (TreeNode<Integer> child : node.children) {
+                queue.add(child);
+            }
+        }
+    }
+
+    /**
+     * 深度优先排序（DFS）
+     * 深度优先排序可以按前序、中序或后序对树节点进行排序。
+     *
+     * @param root
+     */
+    public void dfsSortTree(TreeNode<Integer> root) {
+        if (root == null) return;
+
+        List<Integer> values = new ArrayList<>();
+        collectValues(root, values);
+
+        Collections.sort(values);
+        rebuildTree(root, values);
+    }
+
+    /**
+     * 堆排序
+     * 堆排序可以高效地对树节点值进行排序
+     *
+     * @param root
+     */
+    public void heapSortTree(TreeNode<Integer> root) {
+        if (root == null) return;
+
+        List<Integer> values = new ArrayList<>();
+        collectValues(root, values);
+
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>(values);
+        rebuildTree(root, new ArrayList<>(minHeap));
+    }
+
+    /**
+     * 优化堆的构建过程
+     * 背景：堆排序的核心是构建堆（Heapify），传统方法是从最后一个非叶子节点开始逐个调整，时间复杂度为 O(n)
+     * 优化：可以使用 Floyd 算法（自底向上构建堆），减少调整次数，进一步优化构建堆的过程
+     *
+     * @param list
+     */
+    private void buildHeap(List<Integer> list) {
+        int n = list.size();
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(list, n, i);
+        }
+    }
+
+    /**
+     * 减少交换次数
+     * 背景：在堆排序中，每次调整堆时都需要交换元素，交换操作的开销较大
+     * 优化：可以使用 “延迟交换” 策略，先记录需要交换的元素，最后一次性交换，减少交换次数
+     *
+     * @param list
+     * @param n
+     * @param i
+     */
+    private void heapify(List<Integer> list, int n, int i) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        if (left < n && list.get(left) > list.get(largest)) {
+            largest = left;
+        }
+        if (right < n && list.get(right) > list.get(largest)) {
+            largest = right;
+        }
+
+        if (largest != i) {
+            int swap = list.get(i);
+            list.set(i, list.get(largest));
+            list.set(largest, swap);
+            heapify(list, n, largest);
+        }
+    }
+
+    /**
+     * 使用迭代代替递归
+     * 背景：堆排序中的 heapify 方法通常使用递归实现，递归调用会带来额外的栈空间开销。
+     * 优化：将递归实现改为迭代实现，减少栈空间的使用
+     *
+     * @param list
+     * @param n
+     * @param i
+     */
+    private void heapifyIterative(List<Integer> list, int n, int i) {
+        int largest = i;
+        while (true) {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < n && list.get(left) > list.get(largest)) {
+                largest = left;
+            }
+            if (right < n && list.get(right) > list.get(largest)) {
+                largest = right;
+            }
+
+            if (largest == i) break;
+
+            int swap = list.get(i);
+            list.set(i, list.get(largest));
+            list.set(largest, swap);
+            i = largest;
+        }
+    }
+
+    /**
+     * 结合其他排序算法
+     * 背景：堆排序在数据量较小时效率不如快速排序或插入排序
+     * 优化：在数据量较小时，切换到更高效的排序算法（如插入排序），结合堆排序和插入排序的优点
+     *
+     * @param list
+     */
+    private void hybridSort(List<Integer> list) {
+        if (list.size() <= 10) {
+            insertionSort(list);
+        }
+    }
+
+    private void insertionSort(List<Integer> list) {
+        for (int i = 1; i < list.size(); i++) {
+            int key = list.get(i);
+            int j = i - 1;
+            while (j >= 0 && list.get(j) > key) {
+                list.set(j + 1, list.get(j));
+                j--;
+            }
+            list.set(j + 1, key);
+        }
+    }
+
+
+    /**
+     * 并行化堆排序
+     * 背景：堆排序的调整过程可以并行化，利用多核 CPU 提高性能
+     * 优化：使用多线程并行调整堆的不同部分
+     *
+     * @param list
+     */
+    private void parallelHeapSort(List<Integer> list) {
+        int n = list.size();
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            int finalI = i;
+            executor.submit(() -> heapify(list, n, finalI));
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = n - 1; i > 0; i--) {
+            int swap = list.get(0);
+            list.set(0, list.get(i));
+            list.set(i, swap);
+            heapify(list, i, 0);
+        }
+    }
+
+
+    /**
+     * 自定义排序
+     * 根据具体需求定义排序规则，例如按节点深度或其他属性排序
+     *
+     * @param root
+     * @param comparator
+     */
+    public void customSortTree(TreeNode<Integer> root, Comparator<Integer> comparator) {
+        if (root == null) return;
+
+        List<Integer> values = new ArrayList<>();
+        collectValues(root, values);
+
+        values.sort(comparator);
+        rebuildTree(root, values);
+    }
+
+    private TreeNode<Integer> buildSortedTree(List<Integer> sortedValues) {
         TreeNode<Integer> root = new TreeNode<>(sortedValues.get(0));
         TreeNode<Integer> current = root;
 
-        // 根据排序值依次创建子节点
         for (int i = 1; i < sortedValues.size(); i++) {
             TreeNode<Integer> newNode = new TreeNode<>(sortedValues.get(i));
             current.addChild(newNode);
@@ -280,55 +500,51 @@ public class Tree {
     }
 
     // 辅助方法：对双向树进行排序
-    public void sortBiDirectionalTree(BiDirectionalTreeNode<Integer> root) {
-        if (root == null) return;  // 如果根节点为空，直接返回
 
-        // 统计所有节点值并排序
+    /**
+     * 双向树排序优化
+     * 对双向树的排序可以结合快速排序和双向链接的维护
+     *
+     * @param root
+     */
+    public void sortBiDirectionalTree(BiDirectionalTreeNode<Integer> root) {
+        if (root == null) return;
+
         List<Integer> values = new ArrayList<>();
         collectValues(root, values);
         Collections.sort(values);
 
-        // 重新构建双向树（这里简化为按排序后的值重新构建）
         BiDirectionalTreeNode<Integer> newRoot = buildSortedBiDirectionalTree(values);
 
-        // 更新原有树结构
         root.value = newRoot.value;
         root.children.clear();
         root.children.addAll(newRoot.children);
 
-        // 更新双向链接
         updateBiDirectionalLinks(root, newRoot);
     }
 
-    // 辅助方法：收集双向树中所有节点值
     private void collectValues(BiDirectionalTreeNode<Integer> node, List<Integer> values) {
-        values.add(node.value);  // 添加当前节点值
+        values.add(node.value);
         for (TreeNode<Integer> child : node.children) {
-            collectValues(child, values);  // 递归添加子节点值
+            collectValues(child, values);
         }
     }
 
-    // 辅助方法：根据排序后的值构建双向树
     private BiDirectionalTreeNode<Integer> buildSortedBiDirectionalTree(List<Integer> sortedValues) {
-        if (sortedValues.isEmpty()) return null;
-
-        // 创建根节点（使用第一个排序值）
         BiDirectionalTreeNode<Integer> root = new BiDirectionalTreeNode<>(sortedValues.get(0));
         BiDirectionalTreeNode<Integer> current = root;
 
-        // 根据排序值依次创建子节点
         for (int i = 1; i < sortedValues.size(); i++) {
             BiDirectionalTreeNode<Integer> newNode = new BiDirectionalTreeNode<>(sortedValues.get(i));
             current.addChild(newNode);
             current = newNode;
         }
 
-        // 设置双向链接
         BiDirectionalTreeNode<Integer> prev = null;
         for (BiDirectionalTreeNode<Integer> node : root.getAllNodes()) {
             if (prev != null) {
-                node.prev = prev;  // 设置前驱节点
-                prev.next = node;  // 设置后继节点
+                node.prev = prev;
+                prev.next = node;
             }
             prev = node;
         }
@@ -336,7 +552,6 @@ public class Tree {
         return root;
     }
 
-    // 辅助方法：更新双向树的双向链接
     private void updateBiDirectionalLinks(BiDirectionalTreeNode<Integer> oldTree, BiDirectionalTreeNode<Integer> newTree) {
         // 实际应用中需要更复杂的逻辑来维护双向链接
     }
@@ -344,9 +559,8 @@ public class Tree {
     // 辅助方法：获取树的所有节点（广度优先）
     public List<TreeNode<Integer>> getAllTreeNodes(TreeNode<Integer> root) {
         List<TreeNode<Integer>> nodes = new ArrayList<>();
-        if (root == null) return nodes;  // 如果根节点为空，返回空列表
+        if (root == null) return nodes;
 
-        // 使用队列实现广度优先遍历
         Queue<TreeNode<Integer>> queue = new LinkedList<>();
         queue.add(root);
 
@@ -364,16 +578,15 @@ public class Tree {
     // 辅助方法：获取双向树的所有节点（广度优先）
     public List<BiDirectionalTreeNode<Integer>> getAllBiDirectionalTreeNodes(BiDirectionalTreeNode<Integer> root) {
         List<BiDirectionalTreeNode<Integer>> nodes = new ArrayList<>();
-        if (root == null) return nodes;  // 如果根节点为空，返回空列表
+        if (root == null) return nodes;
 
-        // 使用队列实现广度优先遍历
         Queue<BiDirectionalTreeNode<Integer>> queue = new LinkedList<>();
         queue.add(root);
 
         while (!queue.isEmpty()) {
             BiDirectionalTreeNode<Integer> node = queue.poll();
             nodes.add(node);
-            for (TreeNode child : node.children) {
+            for (TreeNode<Integer> child : node.children) {
                 queue.add((BiDirectionalTreeNode<Integer>) child);
             }
         }
@@ -399,7 +612,6 @@ public class Tree {
             values.add(node.value);
         }
 
-        // 检查值是否按升序排列
         for (int i = 1; i < values.size(); i++) {
             if (values.get(i) < values.get(i - 1)) {
                 return false;
@@ -417,7 +629,6 @@ public class Tree {
             values.add(node.value);
         }
 
-        // 检查值是否按升序排列
         for (int i = 1; i < values.size(); i++) {
             if (values.get(i) < values.get(i - 1)) {
                 return false;
@@ -431,7 +642,6 @@ public class Tree {
     public boolean isBiDirectionalLinksCorrect(BiDirectionalTreeNode<Integer> root) {
         BiDirectionalTreeNode<Integer> current = root;
         while (current != null) {
-            // 检查双向链接是否一致
             if (current.prev != null && current.prev.next != current) {
                 return false;
             }
@@ -440,109 +650,195 @@ public class Tree {
         return true;
     }
 
+    // **新增方法：控制台打印树结构**
+    public void printTree(TreeNode<Integer> root) {
+        if (root == null) {
+            System.out.println("Empty tree");
+            return;
+        }
+
+        printTreeHelper(root, "");
+    }
+
+    private void printTreeHelper(TreeNode<Integer> node, String prefix) {
+        System.out.println(prefix + node.value);
+
+        for (int i = 0; i < node.children.size(); i++) {
+            TreeNode<Integer> child = node.children.get(i);
+            String childPrefix = prefix + (i < node.children.size() - 1 ? "├── " : "└── ");
+            printTreeHelper(child, childPrefix);
+        }
+    }
+
     // 单向树方式排序测试
     @Test
     public void testSingleDirectionTreeSort() {
-        // 构建测试树
         TreeNode<Integer> root = buildTree(3);
+        System.out.println("Original Single Direction Tree:");
+        printTree(root);
 
-        // 对树进行快速排序
         quickSortTree(root);
 
-        // 验证排序结果
-        assert isTreeSorted(root) : "单向树排序失败";
+        System.out.println("\nSorted Single Direction Tree:");
+        printTree(root);
+
+        assert isTreeSorted(root) : "Single direction tree sort failed";
     }
 
     // 双向树排序测试
     @Test
     public void testBiDirectionalTreeSort() {
-        // 构建双向树
         BiDirectionalTreeNode<Integer> root = buildBiDirectionalTree(3);
+        TreeNode<Integer> treeRoot = new TreeNode<>(root.value);
+        for (TreeNode<Integer> child : root.children) {
+            treeRoot.addChild(new TreeNode<>(child.value));
+        }
 
-        // 对双向树进行排序
+        System.out.println("Original Bi-Directional Tree:");
+        printTree(treeRoot);
+
         sortBiDirectionalTree(root);
 
-        // 验证排序结果
-        assert isBiDirectionalTreeSorted(root) : "双向树排序失败";
+        TreeNode<Integer> sortedTreeRoot = new TreeNode<>(root.value);
+        for (TreeNode<Integer> child : root.children) {
+            sortedTreeRoot.addChild(new TreeNode<>(child.value));
+        }
 
-        // 验证双向链接是否正确
-        assert isBiDirectionalLinksCorrect(root) : "双向链接不正确";
+        System.out.println("\nSorted Bi-Directional Tree:");
+        printTree(sortedTreeRoot);
+
+        assert isBiDirectionalTreeSorted(root) : "Bi-directional tree sort failed";
+        assert isBiDirectionalLinksCorrect(root) : "Bi-directional links are incorrect";
     }
 
     // 树节点插入快速排序测试
     @Test
     public void testTreeNodeInsertQuickSort() {
-        // 构建测试树
         TreeNode<Integer> root = buildTree(3);
+        System.out.println("Original Tree for Quick Sort:");
+        printTree(root);
 
-        // 对树进行快速排序
         quickSortTree(root);
 
-        // 验证排序结果
-        assert isTreeSorted(root) : "树节点插入快速排序失败";
+        System.out.println("\nTree after Quick Sort:");
+        printTree(root);
+
+        assert isTreeSorted(root) : "Tree node insertion quick sort failed";
     }
 
     // 栈结构转换为树结构测试
     @Test
     public void testStackToTreeConversion() {
-        // 创建测试栈
         Stack<Integer> stack = new Stack<>();
         Collections.addAll(stack, 5, 3, 8, 1, 4, 6, 2);
 
-        // 将栈转换为树
         TreeNode<Integer> root = stackToTree(stack);
 
-        // 验证转换后的树结构
-        assert root != null : "转换后树为空";
-        assert root.value == 5 : "根节点值不正确";
-        assert root.children.size() >= 6 : "子节点数量不正确";
+        System.out.println("Tree converted from Stack:");
+        printTree(root);
 
-        // 对转换后的树进行排序
         quickSortTree(root);
 
-        // 验证排序结果
-        assert isTreeSorted(root) : "转换后的树排序失败";
+        System.out.println("\nSorted Tree after Conversion from Stack:");
+        printTree(root);
+
+        assert root != null : "Converted tree from stack is empty";
+        assert root.value == 5 : "Root node value is incorrect";
+        assert root.children.size() >= 6 : "Number of child nodes is incorrect";
+        assert isTreeSorted(root) : "Sorted tree from stack conversion failed";
     }
 
     // 链表结构转换为树结构测试
     @Test
     public void testLinkedListToTreeConversion() {
-        // 创建测试链表
         ListNode<Integer> head = buildLinkedList(5, 3, 8, 1, 4, 6, 2);
-
-        // 将链表转换为树
         TreeNode<Integer> root = linkedListToTree(head);
 
-        // 验证转换后的树结构
-        assert root != null : "转换后树为空";
-        assert root.value == 5 : "根节点值不正确";
-        assert root.children.size() >= 6 : "子节点数量不正确";
+        System.out.println("Tree converted from Linked List:");
+        printTree(root);
 
-        // 对转换后的树进行排序
         quickSortTree(root);
 
-        // 验证排序结果
-        assert isTreeSorted(root) : "转换后的树排序失败";
+        System.out.println("\nSorted Tree after Conversion from Linked List:");
+        printTree(root);
+
+        assert root != null : "Converted tree from linked list is empty";
+        assert root.value == 5 : "Root node value is incorrect";
+        assert root.children.size() >= 6 : "Number of child nodes is incorrect";
+        assert isTreeSorted(root) : "Sorted tree from linked list conversion failed";
     }
 
     // 列表集合结构转换为树结构测试
     @Test
     public void testListToTreeConversion() {
-        // 创建测试列表
         List<Integer> list = Arrays.asList(5, 3, 8, 1, 4, 6, 2);
-
-        // 将列表转换为树
         TreeNode<Integer> root = listToTree(list);
 
-        // 验证转换后的树结构
-        assert root != null : "转换后树为空";
-        assert root.value == 5 : "根节点值不正确";
-        assert root.children.size() >= 6 : "子节点数量不正确";
+        System.out.println("Tree converted from List:");
+        printTree(root);
 
-        // 对转换后的树进行排序
         quickSortTree(root);
 
-        // 验证排序结果
-        assert isTreeSorted(root) : "转换后的树排序失败";
+        System.out.println("\nSorted Tree after Conversion from List:");
+        printTree(root);
+
+        assert root != null : "Converted tree from list is empty";
+        assert root.value == 5 : "Root node value is incorrect";
+        assert root.children.size() >= 6 : "Number of child nodes is incorrect";
+        assert isTreeSorted(root) : "Sorted tree from list conversion failed";
+    }
+
+    @Test
+    public void testBfsSortTree() {
+        TreeNode<Integer> root = buildTree(3);
+        System.out.println("Original Tree:");
+        printTree(root);
+
+        bfsSortTree(root);
+
+        System.out.println("\nTree after BFS Sort:");
+        printTree(root);
+
+        assert isTreeSorted(root) : "BFS sort failed";
+    }
+
+    @Test
+    public void testDfsSortTree() {
+        TreeNode<Integer> root = buildTree(3);
+        System.out.println("Original Tree:");
+        printTree(root);
+
+        dfsSortTree(root);
+
+        System.out.println("\nTree after DFS Sort:");
+        printTree(root);
+
+        assert isTreeSorted(root) : "DFS sort failed";
+    }
+
+    @Test
+    public void testHeapSortTree() {
+        TreeNode<Integer> root = buildTree(3);
+        System.out.println("Original Tree:");
+        printTree(root);
+
+        heapSortTree(root);
+
+        System.out.println("\nTree after Heap Sort:");
+        printTree(root);
+
+        assert isTreeSorted(root) : "Heap sort failed";
+    }
+
+    @Test
+    public void testParallelHeapSort() {
+        List<Integer> list = new ArrayList<>();
+        list.add(4);
+        list.add(1);
+        list.add(6);
+        list.add(5);
+        list.add(2);
+        list.add(3);
+        parallelHeapSort(list);
     }
 }
