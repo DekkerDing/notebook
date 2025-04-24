@@ -267,3 +267,10 @@ Spring 循环依赖
         提交事务
             判断 维护在务管理器中的事务回滚标准位 从 当前 ThreadLocal中通过Key值获取数据连接对象发送回滚命令
             如正常操作 这上述步骤直接手动提交
+@Resource / @Autowire
+    @Resource
+        resource是我们JavaEE提供的
+        根据名称去寻找 如果名称不存在 才会根据类型去查找
+    @Autowire
+        它是我们spring框架里面去提供的
+        默认根据类型查找 类型有多个实现再根据名称去查找
