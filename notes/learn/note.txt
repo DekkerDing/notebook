@@ -4,6 +4,38 @@
 下载：https://downloads.camunda.cloud/release/camunda-bpm/run/7.15/
 案例地址：Congratulation!|docs.camunda.org
 
+工作流运行步骤
+    流程定义
+    流程部署
+    启动流程实例
+        获取待办任务
+            用户代办任务
+            通用代办任务
+            数据结构
+                通用参数
+                    act_ge
+                    通用流程变量
+                    通用流程实例
+                    通用流程定义
+                    通用流程资源
+                历史
+                    act_hi
+                    流程实例
+                    流程变量
+                    流程任务
+                流程定义
+                    act_re
+                    内容
+                    静态资源
+                    部署状态
+                流程运行
+                    act_ru
+                    运行时流程变量
+                    运行时流程实例
+                    运行时流程任务
+                    运行时流程参数数据
+    结束流程实例
+
 
 ProcessEngine
 
