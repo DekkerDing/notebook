@@ -308,3 +308,27 @@ Explain
     减少了回表查询的次数和磁盘I/O操作
     从而显著提高了查询性能
     然而覆盖索引的维护成本较高，适用于查询字段固定且较少的场景
+
+行转列 / 列转行
+    行转列
+        确定分组列，转换列，数据列
+        生成伪列
+        做分组查询
+        选择合适的聚合函数
+            select 分组列,
+                聚合函数（case when 转换列 = 转换列值1 then 数据列 else...end）as 列名1，
+                聚合函数（case when 转换列 = 转换列值2 then 数据列 else...end）as 列名2，
+                聚合函数（case when 转换列 = 转换列值3 then 数据列 else...end）as 列名3
+            from 表名
+            group by 分组列;
+    列转行
+        确定转换列
+        非转换列生成新列
+        使用union或unionall进行合并
+        根据需要进行orderby
+            select 非转换列, '转换列1' AS 新转换列名, 转换列1 AS 新数据列名 from 表名
+            UNION ALL
+            select 非转换列, '转换列2' AS 新转换列名, 转换列2 AS 新数据列名 from 表名
+            UNION ALL
+            select 非转换列, '转换列3' AS 新转换列名, 转换列3 AS 新数据列名 from 表名
+            ORDER BY
