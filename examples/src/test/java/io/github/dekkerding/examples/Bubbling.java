@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static io.github.dekkerding.examples.Random.randomList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -266,6 +268,7 @@ public class Bubbling {
         //assertEquals(2, stack.pop());
         //assertEquals(3, stack.pop());
     }
+
     // 测试场景 5: 列表集合冒泡排序
     @Test
     public void testBubbleSortList() {
@@ -274,4 +277,36 @@ public class Bubbling {
 
         assertEquals(Arrays.asList(1, 2, 3), list);
     }
+
+    @Test
+    public void bubbleSortRandom() {
+        schedule(randomList(3));
+    }
+
+    private static void schedule(List<List<Integer>> randomList) {
+
+        List<Integer> resultList = new LinkedList<>();
+
+        // 打印生成的随机数集合
+        for (List<Integer> group : randomList) {
+            int n = group.size();
+            boolean flag = true;
+            for (int i = 0; i < n - 1; i++) { // 冒泡次数
+                for (int j = 0; j < n - i - 1; j++) {
+                    // 冒泡步骤
+                    if (group.get(j) > group.get(j + 1)) {
+                        flag = false;
+                        Collections.swap(group, j, j + 1);
+                    }
+                }
+                if(flag){
+                    break;
+                }
+            }
+            System.out.println("排序后的随机数组: " + group);
+            resultList.addAll(group); // 合并所有排序后的列表
+        }
+        System.out.println("全部排序后的结果: " + resultList.parallelStream().sorted().collect(Collectors.toList()));
+    }
+
 }
