@@ -291,7 +291,7 @@ public class Bubbling {
         for (List<Integer> group : randomList) {
             int n = group.size();
             boolean flag = true;
-            for (int i = 0; i < n - 1; i++) { // 冒泡次数
+            for (int i = 0; i < n - 1; i++) { // 冒泡次数 轮数
                 for (int j = 0; j < n - i - 1; j++) {
                     // 冒泡步骤
                     if (group.get(j) > group.get(j + 1)) {
