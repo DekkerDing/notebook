@@ -403,7 +403,26 @@ volatile
 finally语句块在两种情况下不会执行
     1、程序没有进入到try语句块因为异常导致程序终止，这个问题主要是开发人员在编写代码的时候，异常捕获的范围不够
     2、在try或者cache语句块中，执行了System.exit（O）语句，导致JVM直接退出
+    3. 不在 try {} 语句块当中 在try之前 return
+    4. 异常没有被 catch 捕获住 在try之前就发生异常了
 
+return 与 finally
+    1. return 与 finally 同时存在 先执行 finally 再执行 return
+    2. return 返回变量时 try 语句块里变量(代码走到这里会把 变量 暂存 然后执行finaLLy 最后再返回 变量)
+        try、catch有return情况，先将结果保存在临时栈中，再去执行finally，最后返回
+    3. finally 捕获语句块中有 return 就直接返回 finally 中 return 数据 (这里的return优先于try里的return)
+        如果finally中也有return那么将直接返回finally中的return
+
+final finalize的区别
+    final
+        说明这个变量是一个常量，意味着它的值在初始化之后不能再次改变
+        说明这个方法不能被重写，但是不影响继承这个方法
+        说明这个类不能被继承，所以不能使用 final和abstract来修饰同一个类，同样的，final也不能用来修饰接口
+    finalize
+        finalize通常指的是finalize方法，它是 Object类的方法
+        是在对象被垃圾回收器回收之前调用的
+        我们可以通过重写这个 finalize0方法，给对象自己最后一个复活的机会
+        但是不能保证finalizeO方法立即执行什么时候调用具体由虚拟机决定
 SPI
     机制的主要思想呢是把装配的控制权转移到了程序之外完成标准和实现的一个解耦
     以及提供一个动态可插拔的扩展能力
