@@ -278,12 +278,16 @@ public class Bubbling {
         assertEquals(Arrays.asList(1, 2, 3), list);
     }
 
+    /**
+     *  n2
+     */
     @Test
+    @ExecutionTime
     public void bubbleSortRandom() {
         schedule(randomList(3));
     }
 
-    private static void schedule(List<List<Integer>> randomList) {
+    public void schedule(List<List<Integer>> randomList) {
 
         List<Integer> resultList = new LinkedList<>();
 
@@ -299,7 +303,7 @@ public class Bubbling {
                         Collections.swap(group, j, j + 1);
                     }
                 }
-                if(flag){
+                if (flag) {
                     break;
                 }
             }

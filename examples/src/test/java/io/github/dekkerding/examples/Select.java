@@ -14,6 +14,7 @@ import static io.github.dekkerding.examples.Random.randomList;
 public class Select {
 
     @Test
+    @ExecutionTime
     public void selectSort() {
         List<List<Integer>> list = randomList(3);
         List<Integer> mergeList = new LinkedList<>();
@@ -27,7 +28,7 @@ public class Select {
         System.out.println("全部排序后的结果: " + mergeList.parallelStream().sorted().collect(Collectors.toList()));
     }
 
-    private void selectSortCore(List<Integer> list) {
+    public void selectSortCore(List<Integer> list) {
         int n = list.size();
         for (int i = 0; i < n - 1; i++) {
             // 假设当前索引为最小值位置
