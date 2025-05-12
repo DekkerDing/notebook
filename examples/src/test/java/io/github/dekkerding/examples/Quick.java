@@ -22,7 +22,7 @@ public class Quick {
     public void quickSort() {
         List<List<Integer>> list = randomList(3);
         for (List<Integer> metadataList : list) {
-            quickSortCoreDetails(metadataList,0,metadataList.size()-1);
+            quickSortCore(metadataList,0,metadataList.size()-1);
             System.out.println(metadataList);
         }
 
@@ -59,51 +59,6 @@ public class Quick {
             quickSortCore(resultdataList, l + 1, right); // 排序右半部分
         }
     }
-    public void quickSortCoreDetails(List<Integer> resultdataList, int left, int right) {
-    if (left < right) {
-        int pivot = resultdataList.get(left); // 获取基准值
-        int l = left, r = right;
-
-        System.out.println("进入排序区间 [" + left + ", " + right + "]，基准值：" + pivot);
-        System.out.println("初始数组：" + resultdataList);
-
-        while (l < r) {
-            // 从右往左找小于 pivot 的数
-            while (l < r && resultdataList.get(r) >= pivot) {
-                System.out.println("r-- (" + r + ") -> 值：" + resultdataList.get(r));
-                r--;
-            }
-            if (l < r) {
-                resultdataList.set(l, resultdataList.get(r));
-                System.out.println("将右指针值 " + resultdataList.get(r) + " 移动到左指针位置 " + l);
-                l++;
-            }
-
-            // 从左往右找大于等于 pivot 的数
-            while (l < r && resultdataList.get(l) < pivot) {
-                System.out.println("l++ (" + l + ") -> 值：" + resultdataList.get(l));
-                l++;
-            }
-            if (l < r) {
-                resultdataList.set(r, resultdataList.get(l));
-                System.out.println("将左指针值 " + resultdataList.get(l) + " 移动到右指针位置 " + r);
-                r--;
-            }
-        }
-
-        // 把 pivot 放回中间位置
-        resultdataList.set(l, pivot);
-        System.out.println("放置 pivot 到位置 " + l + "，当前数组：" + resultdataList);
-
-        // 递归排序左右两部分
-        System.out.println("递归排序左半部分 [" + left + ", " + (l - 1) + "]");
-        quickSortCoreDetails(resultdataList, left, l - 1);  // 排序左半部分
-        System.out.println("递归排序右半部分 [" + (l + 1) + ", " + right + "]");
-        quickSortCoreDetails(resultdataList, l + 1, right); // 排序右半部分
-
-        System.out.println("完成排序区间 [" + left + ", " + right + "]，当前数组：" + resultdataList);
-    }
-}
 
 //    public void quickSortCore(List<Integer> resultdataList, int left, int right) {
 //        quickSortWithComparator(resultdataList, left, right, Comparator.naturalOrder()); // 默认升序
