@@ -13,7 +13,7 @@ import static io.github.dekkerding.examples.Random.randomList;
 @SpringBootTest
 public class Bucket{
     @Test
-    @ExecutionTime
+    @Monitoring
     public void bucketSort(){
         List<List<Integer>> list = randomList(3);
         for (List<Integer> metadataList : list) {

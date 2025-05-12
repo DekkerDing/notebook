@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@ExtendWith(ExecutionTimeAspect.class)
-public @interface ExecutionTime {
+@ExtendWith(MonitoringAspect.class)
+public @interface Monitoring {
 }

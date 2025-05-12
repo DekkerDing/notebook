@@ -14,7 +14,7 @@ import static io.github.dekkerding.examples.Random.randomList;
 public class Select {
 
     @Test
-    @ExecutionTime
+    @Monitoring
     public void selectSort() {
         List<List<Integer>> list = randomList(3);
         List<Integer> mergeList = new LinkedList<>();

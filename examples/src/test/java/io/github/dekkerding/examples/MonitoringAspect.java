@@ -4,11 +4,14 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 
-public class ExecutionTimeAspect implements BeforeEachCallback, AfterEachCallback {
+public class MonitoringAspect implements BeforeEachCallback, AfterEachCallback {
 
     private static final ThreadLocal<Long> START_TIME = new ThreadLocal<>();
+    private static final ThreadLocal<Long> START_MEMORY = new ThreadLocal<>();
+
 
 
     /**
@@ -20,11 +23,19 @@ public class ExecutionTimeAspect implements BeforeEachCallback, AfterEachCallbac
     @Override
     public void afterEach(ExtensionContext context) {
         Method method = context.getRequiredTestMethod();
-        if (method.isAnnotationPresent(ExecutionTime.class)) {
+        if (method.isAnnotationPresent(Monitoring.class)) {
             long duration = System.currentTimeMillis() - START_TIME.get();
+
+            // 获取内存使用情况
+            long endMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+            long memoryConsumption = endMemory - START_MEMORY.get();
+
             System.out.println("方法 [" + method.getName() + "] 耗时: " + duration + " ms");
+            System.out.println("方法 [" + method.getName() + "] 内存消耗: " + String.format("%.2f", (double) memoryConsumption / (1024 * 1024)) + " MB");
         }
         START_TIME.remove();
+        START_MEMORY.remove();
+
     }
 
     /**
@@ -36,5 +47,15 @@ public class ExecutionTimeAspect implements BeforeEachCallback, AfterEachCallbac
     @Override
     public void beforeEach(ExtensionContext context) {
         START_TIME.set(System.currentTimeMillis());
+        // 建议手动触发 GC（但不能保证立即生效）
+        System.gc();
+        try {
+            Thread.sleep(30); // 等待 GC 尽可能完成
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        long usedMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+        START_MEMORY.set(usedMemory);
     }
 }

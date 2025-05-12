@@ -282,7 +282,7 @@ public class Bubbling {
      *  n2
      */
     @Test
-    @ExecutionTime
+    @Monitoring
     public void bubbleSortRandom() {
         schedule(randomList(3));
     }

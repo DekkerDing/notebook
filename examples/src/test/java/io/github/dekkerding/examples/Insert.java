@@ -12,7 +12,7 @@ import static io.github.dekkerding.examples.Random.randomList;
 public class Insert {
 
     @Test
-    @ExecutionTime
+    @Monitoring
     public void insertSort() {
         List<List<Integer>> list = randomList(3);
         for (List<Integer> metadataList : list) {

@@ -18,7 +18,7 @@ public class Quick {
      * 将原数组根据枢纽元划分开来的过程称之为：分区 (Partition)
      */
     @Test
-    @ExecutionTime
+    @Monitoring
     public void quickSort() {
         List<List<Integer>> list = randomList(3);
         for (List<Integer> metadataList : list) {

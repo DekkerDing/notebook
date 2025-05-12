@@ -13,7 +13,7 @@ public class Merger {
 
 
     @Test
-    @ExecutionTime
+    @Monitoring
     public void mergerSort() {
         List<Integer> merger = new ArrayList<>();
         List<List<Integer>> list = randomList(3);
