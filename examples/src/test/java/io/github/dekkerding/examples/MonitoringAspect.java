@@ -22,12 +22,18 @@ public class MonitoringAspect implements BeforeEachCallback, AfterEachCallback {
      */
     @Override
     public void afterEach(ExtensionContext context) {
+
+        if (START_TIME.get() == null || START_MEMORY.get() == null) {
+            System.err.println("缺少起始时间或内存记录");
+            return;
+        }
+
         Method method = context.getRequiredTestMethod();
         if (method.isAnnotationPresent(Monitoring.class)) {
             long duration = System.currentTimeMillis() - START_TIME.get();
 
             // 获取内存使用情况
-            long endMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+            long endMemory = getUsedMemoryFromEden();
             long memoryConsumption = endMemory - START_MEMORY.get();
 
             System.out.println("方法 [" + method.getName() + "] 耗时: " + duration + " ms");
@@ -55,7 +61,13 @@ public class MonitoringAspect implements BeforeEachCallback, AfterEachCallback {
             Thread.currentThread().interrupt();
         }
 
-        long usedMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
-        START_MEMORY.set(usedMemory);
+        START_MEMORY.set(getUsedMemoryFromEden());
+    }
+
+    public static long getUsedMemoryFromEden() {
+        return ManagementFactory.getMemoryPoolMXBeans().stream()
+                .filter(bean -> bean.getName().contains("Eden"))
+                .mapToLong(bean -> bean.getUsage().getUsed())
+                .sum();
     }
 }
