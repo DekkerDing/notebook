@@ -197,7 +197,12 @@ EDA 事件驱动
 MDM
 
 JWT 续签
-    1. 用户数据 + 物理机环境特征 (网卡 IP MAC ...) = MD5
-    2. Redis(MD5,EXP 过期时间)
-    3. 用户请求时 校验 过期时间 如 过期时间为 2H if 如 大于1H？ 正常返回 ： 执行 Redis expire 时间续期
-    4. 用户注销 自动/调用 删除 Redis Key
+    方案一
+        1. 用户数据 + 物理机环境特征 (网卡 IP MAC ...) = MD5
+        2. Redis(MD5,EXP 过期时间)
+        3. 用户请求时 校验 过期时间 如 过期时间为 2H if 如 大于1H？ 正常返回 ： 执行 Redis expire 时间续期
+        4. 用户注销 自动/调用 删除 Redis Key
+    方案二
+        1. 用户请求生成 JWT (包含 refresh_token)
+        2. 校验 access token + Redis中(refresh_token)
+        3. 判断时间 调用刷新 Token 接口 返回新的  access token + refresh_token
