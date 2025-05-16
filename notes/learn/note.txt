@@ -304,6 +304,7 @@ Explain
         FROM xxx WHERE id >#{lastId} order by c.id limit #{pageSize};
 
 覆盖索引
+    https://www.bilibili.com/video/BV1PL411g7Vj?spm_id_from=333.788.player.switch&vd_source=afc578e8acd436b9b937b4fb9a3c7095
     覆盖索引通过将查询所需的所有字段包含在索引中
     减少了回表查询的次数和磁盘I/O操作
     从而显著提高了查询性能
