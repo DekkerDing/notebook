@@ -1291,3 +1291,8 @@ Transform
     Ingest：预处理节点，作用类似于Logstash中的Filter ml：机器学习节点
     remote_cluster_client：候选客户端节点 transform：转换节点
     voting_only：仅投票节点
+
+Completion Suggester
+    用户每输入一个字符，就需要即时发送一个查询请求到后段查找匹配项对性能要求比较苛刻
+    Elasticsearch采用了不同的数据结构，并非通过倒排索引来完成将 Analyze 的数据编码成FST和索引I一起存放
+    FST会被ES整个加载进内存速度很快
