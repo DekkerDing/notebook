@@ -313,4 +313,17 @@ public class Bubbling {
         System.out.println("全部排序后的结果: " + resultList.parallelStream().sorted().collect(Collectors.toList()));
     }
 
+    public void swwap(int[] array, int index1, int index2) {
+        array[index1] = array[index1] ^ array[index2];
+        array[index2] = array[index1] ^ array[index2];
+        array[index1] = array[index1] ^ array[index2];
+    }
+
+    public int[] randomArray(int n) {
+        int[] array = new int[n];
+        for (int i = 0; i < n; i++) {
+            array[i] = (int) (Math.random() * 100);
+        }
+        return array;
+    }
 }
