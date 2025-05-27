@@ -778,3 +778,24 @@ JVM 命令
         Select in Threads 查看线程详情信息
 
 Arthas
+
+throws 和 throw 的区别
+    ‌在Java中 throw用于在方法内手动抛出异常对象而 throws 用于在方法声明中指定可能抛出的异常类型‌ 两者的核心区别体现在语法位置使用目的和异常处理机制上
+    语法形式
+        throw
+            throw是语句，在方法体内部使用 后接具体异常对象实例 如 throw new IllegalArgumentException()
+        throws
+            throws是方法签名的一部分在方法声明末尾使用后接异常类型 如 public void readFile() throws IOException
+    作用与使用场景
+        throw
+            throw表示‌主动触发异常‌，通常用于条件判断后的错误处理 如参数非法时抛出异常
+            throw一次只能抛出一个异常对象 可以是自定义或内置异常
+        throws
+            throws表示‌声明方法可能抛出的异常类型‌将异常处理责任传递给调用者适用于检查异常
+            throws可声明多个异常类型（用逗号分隔）
+    异常处理机制
+        throw
+            throw 一旦执行方法内后续代码立即终止异常由最近匹配的catch块处理
+        throws
+            throws声明后调用者需通过try-catch捕获异常或继续用throws向上声明
+            throws在涉及检查异常时必须声明（否则编译报错），但对非检查异常（如RuntimeException）可省略
