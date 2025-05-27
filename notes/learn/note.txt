@@ -274,3 +274,19 @@ Spring 循环依赖
     @Autowire
         它是我们spring框架里面去提供的
         默认根据类型查找 类型有多个实现再根据名称去查找
+
+Spring Bean 作用域
+    Spring提供了几种不同的Bean作用域每种作用域决定了Bean实例是如何创建配置以及何时被销毁的
+    Singleton（单例）
+        这是默认的作用域 在Spring容器中每个Bean定义对应一个单一实例这意味着无论你请求多少次Spring都会返回同一个Bean实例
+        单例作用域适用于那些不需要状态或可以共享状态的应用组件
+    Prototype（原型）
+        当指定为prototype作用域时 每次通过容器请求该Bean时都会创建一个新的Bean实例
+        原型作用域则适用于每次调用都需要独立状态的情况
+    Request（请求）
+        在Web应用中 每次HTTP请求都会创建一个新的Bean实例该作用域仅在请求级别有效这意味着每个HTTP请求都会有其专有的Bean实例
+    Session（会话）
+        类似于请求作用域 但在Web应用中每次HTTP Session会有一个新的Bean实例这对于需要跨多个请求保持状态的情况很有用
+        请求和会话作用域则分别适用于需要根据请求或会话生命周期管理的场景
+    Application（应用上下文）
+        每个ServletContext只有一个Bean实例这在需要跨多个HTTP会话共享数据时非常有用例如，在Web应用中，你可能希望有一个全局计数器或配置对象
