@@ -779,6 +779,19 @@ JVM 命令
 
 Arthas
 
+排查
+    top 确定 进程ID 使用情况
+    ps -mp 进程ID -o THREAD,tid,time 查看线程详情情况
+    printf "%x\n" 线程ID 进制转换
+    jstack 进程ID | grep 线程ID (转换后) -A100 打印堆栈信息
+    CPU 飙高现象
+        while 死循环或者超大的循环 比如对5000万数据加工运算
+        频繁的创建对象触发频繁YoungGC会导致CPU占用率升 比如不分页将100万JSON对象转Entity实体类
+        超大的浮点运算 例如3D渲染、科学运算
+        超多线程（连接池）应用程序线程调度的开销极大
+
+
+
 throws 和 throw 的区别
     ‌在Java中 throw用于在方法内手动抛出异常对象而 throws 用于在方法声明中指定可能抛出的异常类型‌ 两者的核心区别体现在语法位置使用目的和异常处理机制上
     语法形式
