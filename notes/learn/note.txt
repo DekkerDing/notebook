@@ -847,3 +847,11 @@ QPS
             应用二级缓存 (过期时间设置为 5 秒) 减少高频访问全量 Redis 缓存压力 相当于频率调整为5秒一次
 集群主从
     各个节点会互相通信，采用gossip协议交换节点元数据信息
+
+Redis 条件查询前置
+    https://www.bilibili.com/video/BV1Mh41137gb/?spm_id_from=333.1387.upload.video_card.click&vd_source=afc578e8acd436b9b937b4fb9a3c7095
+    基于 ZSet 做数据前置排序 (最新发布基于算法 将评分排序考前 以此类推时间久远的分值较大)
+    电商场景
+        商铺 ID
+        查询条件 (关注的维度 如 价格 上架时间 ...)
+        合并指令发送 查询 JSON 详情信息体
