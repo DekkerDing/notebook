@@ -855,3 +855,16 @@ Redis 条件查询前置
         商铺 ID
         查询条件 (关注的维度 如 价格 上架时间 ...)
         合并指令发送 查询 JSON 详情信息体
+
+问题解决方案
+    --intrinsic-Latency redis-cli -h 127.0.0.1 -p 6379 60 Redis服务器之间的网络延迟 60秒内的最大响应延迟
+    查看slowlog (慢日志)
+        SLOWLOG get 5
+    redis-cli -h 127.0.0.1 -p 6379 --bigkeys -i 0.01 大 Key 分析
+        将释放key的操作放到后台线程执行
+            UNLINK命令替代DEL
+            开启lazy-free机制（lazyfree-lazy-user-del=yes)
+        在设置key的过期时间时，增加一个随机时间
+    fork耗时严重
+        主进程需要拷贝自己的内存页表给子进程那么这个拷贝的过程也会比较耗时
+    当我们的应用程序频繁修改Redis中的数据时，就有可能会导致Redis产生内存碎片会降低Redis的内存使用率
