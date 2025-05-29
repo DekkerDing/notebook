@@ -306,6 +306,7 @@ Explain
             表示 查询的结果在返回给客户端时 又 做了第二次排序操作
         Using temporary
             意味着需要创建临时表保存中间结果
+    explain extended 打印执行计划详情
 
 脏页 check point
     脏页现象： Mysql 内存占存的数据与磁盘比较不一致
