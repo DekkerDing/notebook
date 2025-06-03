@@ -304,8 +304,57 @@ Explain
         Using filesort
             意味着需要执行额外的排序操作 通常需要占用大量的内存或者磁盘
             表示 查询的结果在返回给客户端时 又 做了第二次排序操作
+            需要对结果集进行外部排序 以满足查询中的 ORDER BY 条件
+            如果排序数据量大于 sort_buffer_size 则需要利用磁盘临时文件辅助排序
+            解决方案
+                那么我们就可以确保 ORDER BY 子句中的字段是索引的一部分
+                使 ORDER BY 中的列顺序与索引中的列顺序一致（order by a,b,c idx_a_b_c(a,b,c))
+                并且考虑使用复合索引。如果 ORDER BY 子句涉及多个列，创建一个包含这些列的复合索引可能会有助于消除 Using filesort
+                调整 sort_buffer_size 参数 这个参数决定了排序操作可以使用的内存量排序就在内存中完成
         Using temporary
             意味着需要创建临时表保存中间结果
+            内部临时表
+                场景
+                    UNION ALL
+                    Group BY
+                    表连接中 ORDER BY的列不在驱动表中的
+                    DISTINCT 查询并且加上 ORDER BY
+                    SQL 中用到 SQL_SMALL_RESULT 修饰时
+                    复杂的派生表
+                使用内存
+                    需要存储数据量不超过配置项tmp_table_size与max_heap_table_size的值
+                先使用内存 再转化成磁盘文件
+                    当内存无法满足内部临时表存储的数据量时 MySQL会将临时表从内存转到磁盘文件 如果临时数据量庞大可能会导致磁盘容量的异常占用
+                直接使用磁盘文件
+                    使用 SQL_BIG_RESULT 的修饰时会直接使用磁盘文件；另一种是临时表字段中存在 BLOB 或 TEXT 列时也会直接放弃使用内存临时表
+                监控
+                    created_tmp_tables ：每创建一个临时表时会累加1
+                    created_tmp_disk_tables：每一次由内存临时表转为磁盘临时表时会累加1
+                    评估方式：created_tmp_disk_tables / created_tmp_tables 比值越大说明磁盘临时表的占比越高 性能越差
+                调优
+                    减少查询不必要的字段：减小临时表单行数据大小，进而提升内存临时表可存放的数据行数
+                    调大临时表内存参数：修改系统变量 tmp_table_size 和 max_heap_table_size 的值
+                    让临时表可以使用更多的内存
+                    此处不能盲目调整，需要评估根因SQL使用临时表实际需要的内存大小（row_length*行数）
+                    如果略微上调参数即可满足临时表数据量要求可以选择调参验证
+                    如果需要的内存与现有配置相差较大 则需要评估服务器整体内存使用情况
+                    避免OOM
+                    Union ALL / Union
+                        考虑是否需要去重，如果不需要的话可以使用Union ALL 代替 Union，避免使用内部临时表
+                    Group By优化方向
+                        MySQL8.0之前GroupBy会附带排序，如果没有排序要求可以添加order by null
+                        借助索引进行Group by聚合操作，可以避免使用内部临时表
+                线上环境
+                    考虑 开辟新表空间 (如 大宽表 减少 Join 临时表资源) 实现监听 增量
+                    或者
+                        使用CREATE TABLE ... SELECT‌：这种方式不会锁定源表，但会锁定目标表
+                        它通过创建一个新的表，并将源表的数据复制到新表中，对源表的读写操作没有影响，但对目标表的写操作有影响‌
+                    或者
+                        定时轮询 集合 汇总至 Redis 实现缓存前置 如 Redis 条件缓存集合
+                    或者
+                        filnk CDC 数据流式 处理
+
+
     explain extended 打印执行计划详情
 
 脏页 check point
