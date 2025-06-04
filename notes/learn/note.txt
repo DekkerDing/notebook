@@ -492,3 +492,35 @@ Not In / Not Exists
     表级过滤谓词
         在执行计划中对应于 Extra字段 的 Using where
             谓词中的非索引字段条件在表级别进行判断 意味着数据库需要访问表中的数据然后再应用该条件
+
+order by
+
+
+group by
+    Mysql 分组中包含排序步骤
+        聚合函数的使用：排序可以帮助最快找到最高或者最低的值
+        TopN查询：排序后，获取每个分组中前N个记录，更加方便
+        结果的可读性：排序之后，可以更好的理解分组统计之后的结果
+        用户需求：用户希望按某个列分组之后，进行排序
+    where having
+        having子句用于分组后的筛选，where子句用于行条件的筛选
+        having都是配合分组和聚合函数一起出现
+        where子句中不能使用聚合函数，但是having可以
+    优化
+        分组时 手动指定取消 默认 排序步骤
+            ORDER BY NULL
+        基于 聚合索引 实现覆盖索引 索引表维护排序
+        添加 SQL_BIG_RESULT
+            EXPLAIN SELECT SQL_BIG_RESULT city ,COUNT(*) FROM emp GROUP BY city;
+            一旦添加了 SQL_BIG_RESULT MySQL就不会再用B+树结构存储临时表数据存储效率低 会选择使用数组直接用数组存储
+
+空值处理
+    数据库中的空值（NULL）是一个特殊的值，代表了缺失的数据或者
+    SQL逻辑运算的结果存在三种情况：真、假或者未知(Unknown)
+    NOT IN
+    分组操作中的多个空值会被看作是相同的数据
+
+字符串创建索引技巧
+    前缀索引
+        前缀区分度计算 : count(DISTINCT LEFT(email,4))/count(DISTINCTemail)
+        CREATE INDEX idx_emp_email_prefix ON employee（email(6));
