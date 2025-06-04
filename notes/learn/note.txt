@@ -367,6 +367,7 @@ Explain
         innodb_fast_shutdown|1；如果关闭数据库将bufferpool中所有的脏页全部刷写到磁盘
 
 深度分页
+
     MYSQL需要扫描m条记录并跳过这个偏量m才能将你想要的n条记录返回给你m值越大那么扫描的记录就会越多
     依托于 B+Tree Where id > xxx limit 0,xxx
     子查询 + 覆盖索引
@@ -523,4 +524,15 @@ group by
 字符串创建索引技巧
     前缀索引
         前缀区分度计算 : count(DISTINCT LEFT(email,4))/count(DISTINCTemail)
-        CREATE INDEX idx_emp_email_prefix ON employee（email(6));
+        CREATE INDEX idx_emp_email_prefix ON employee（email(6))
+
+SQL 执行顺序
+    1. FROM JOIN
+    2. ON
+    3. WHERE
+    4. GROUP BY
+    5. HAVING
+    6. SELECT
+    7. UNION
+    8. ORDER BY
+    9. OFFSET (limit)
