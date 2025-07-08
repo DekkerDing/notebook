@@ -48,7 +48,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
-
+    implementation 'org.redisson:redisson:3.16.8'
+    //implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.16.8'
 }
 
 tasks.named('test') {
