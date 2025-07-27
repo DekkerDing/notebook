@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  redis-6379:
+    image: redis:latest
+    container_name: redis.conf-6379
+    ports:
+      - "6379:6379"
+      - "16379:16379" # cluster bus port
+    volumes:
+      - ./data/redis6379:/data
+      - ./config/redis.conf.conf:/usr/local/etc/redis.conf/redis.conf
+    command: ["redis.conf-server", "/usr/local/etc/redis.conf/redis.conf"]
+    networks:
+      redis-cluster-net:
+        ipv4_address: 10.101.11.10
+
+  redis-6380:
+    image: redis:latest
+    container_name: redis.conf-6380
+    ports:
+      - "6380:6379"
+      - "16380:16379" # cluster bus port
+    volumes:
+      - ./data/redis6380:/data
+      - ./config/redis.conf.conf:/usr/local/etc/redis.conf/redis.conf
+    command: ["redis.conf-server", "/usr/local/etc/redis.conf/redis.conf"]
+    networks:
+      redis-cluster-net:
+        ipv4_address: 10.101.11.11
+
+  redis-6381:
+    image: redis:latest
+    container_name: redis.conf-6381
+    ports:
+      - "6381:6379"
+      - "16381:16379" # cluster bus port
+    volumes:
+      - ./data/redis6381:/data
+      - ./config/redis.conf.conf:/usr/local/etc/redis.conf/redis.conf
+    command: ["redis.conf-server", "/usr/local/etc/redis.conf/redis.conf"]
+    networks:
+      redis-cluster-net:
+        ipv4_address: 10.101.11.12
+
+networks:
+  redis-cluster-net:
+    external: true
