@@ -20,7 +20,7 @@ services:
     image: redis:latest
     container_name: redis-6380
     ports:
-      - "6380:6379"
+      - "6380:6380"
       - "16380:16380" # cluster bus port
     volumes:
       - ./data/redis6380:/data
@@ -35,7 +35,7 @@ services:
     image: redis:latest
     container_name: redis-6381
     ports:
-      - "6381:6379"
+      - "6381:6381"
       - "16381:16381" # cluster bus port
     volumes:
       - ./data/redis6381:/data
