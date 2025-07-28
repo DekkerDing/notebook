@@ -21,7 +21,7 @@ services:
     container_name: redis-6380
     ports:
       - "6380:6379"
-      - "16380:16379" # cluster bus port
+      - "16380:16380" # cluster bus port
     volumes:
       - ./data/redis6380:/data
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
@@ -36,7 +36,7 @@ services:
     container_name: redis-6381
     ports:
       - "6381:6379"
-      - "16381:16379" # cluster bus port
+      - "16381:16381" # cluster bus port
     volumes:
       - ./data/redis6381:/data
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
