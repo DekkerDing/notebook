@@ -9,6 +9,31 @@ vim /etc/fstab
 # /swap.img     none    swap    sw      0       0
 sudo rm -f /swap.img
 
+# 查询系统发行版本信息
+lsb_release -a
+
+# Ubuntu 更换阿里云源
+sudo cp -a /etc/apt/sources.list /etc/apt/sources.list.bak
+
+# ubuntu 22.04 LTS (jammy)
+deb https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+
+deb https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+
+deb https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+
+# deb https://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+
+deb https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+
+
+#一键脚本
+sudo sed -i 's/archive\.ubuntu\.com\|security\.ubuntu\.com/mirrors\.aliyun\.com/' /etc/apt/sources.list && sudo apt update && sudo apt-get -f install && sudo apt upgrade
 
 #禁用 Snap 服务
 #保留 2 个最近版本，其余版本将被清理
