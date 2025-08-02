@@ -349,6 +349,42 @@ sudo apt install bleachbit
 export DISPLAY=:0
 sudo bleachbit --clean system.cache system.tmp
 
+# 实时更新显示系统中各个进程的资源使用情况
+# 按 P 键可以按照内存使用量排序
+top
+
+# 命令可以用来查看当前运行的进程的详细信息
+ps
+
+# 查看内存使用详情
+ps aux --sort=-%mem | head
+
+# 显示进程的内存映射可以帮助你了解特定进程如何使用内存
+pmap
+
+# 查看该进程的内存使用详情
+pmap -x <PID>
+
+# 提供了一个更友好的界面和更多的功能 按 F6 可以选择排序方式
+htop
+
+# 显示内存使用情况 以MB为单位
+free -m
+
+# 系统内存和交换空间使用的详细信息
+vmstat -s
+
+# 查看特定进程的内存使用情况
+smem -P <process_name>
+
+# 按实际物理内存使用情况排序
+smem -s rss
+
+# 获取占用CPU资源最多的10个进程
+ps aux|head -1;ps aux|grep -v PI|sort -rn -k +3|head
+
+# 获取占用内存资源最多的10个进程
+ps aux|head -1;ps aux|grep -v PID|sort -rn -k +4|head
 
 #列出目录占用情况
 du -h --max-depth=1 / | sort -h
