@@ -80,6 +80,18 @@ sudo ubuntu-drivers autoinstall
 apt-cache madison docker-ce
 apt-cache madison docker-ce-cli
 
+# 修改Docker默认安装目录 选择自定义存储空间较大的树节点进行存放
+# Docker默认的目录在/var/lib/docker，有个简易的方法就是创建一个软链，替换这个目录就好了
+
+# 删除原Docker指定文件安装目录
+rm -rf /var/lib/docker/
+
+# 创建自定义Docker 安装目录
+mkdir /home/docker
+
+# 设置软连接进行指向
+ln -s /home/docker/ /var/lib/docker
+
 #安装最新版
 sudo apt-get install -y docker-ce
 
