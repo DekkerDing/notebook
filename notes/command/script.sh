@@ -13,3 +13,10 @@ docker run -d --name redis-node-3 --net host --privileged=true -v /data/redis/sh
 docker run -d --name redis-node-4 --net host --privileged=true -v /data/redis/share/redis-node-4:/data redis:6.0.8 --cluster-enabled yes --appendonly yes --port 6384
 docker run -d --name redis-node-5 --net host --privileged=true -v /data/redis/share/redis-node-5:/data redis:6.0.8 --cluster-enabled yes --appendonly yes --port 6385
 docker run -d --name redis-node-6 --net host --privileged=true -v /data/redis/share/redis-node-6:/data redis:6.0.8 --cluster-enabled yes --appendonly yes --port 6386
+
+docker exec -it redis-6379 bash \
+redis-cli --cluster create \
+  192.168.10.109:6379 192.168.10.109:6380 192.168.10.109:6381 \
+  192.168.10.107:6379 192.168.10.107:6380 192.168.10.107:6381 \
+  --cluster-replicas 1 \
+  -a drk@2025
