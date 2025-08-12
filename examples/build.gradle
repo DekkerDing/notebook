@@ -51,6 +51,11 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation 'org.apache.lucene:lucene-core:8.11.3'
+    implementation 'org.apache.lucene:lucene-analyzers-common:8.11.3'
+    implementation 'org.apache.lucene:lucene-queryparser:8.11.3'
+    implementation 'org.witea.analyzer:ik-analyzer:5.0.3'
+    implementation 'com.github.jelmerk:hnswlib-core:1.2.1'
 
 }
 
