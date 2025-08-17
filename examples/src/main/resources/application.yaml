@@ -10,3 +10,4 @@ spring:
         max-idle: 8
         max-active: 16
         max-wait: 100000
+    key-prefix: "examplesApplication:"

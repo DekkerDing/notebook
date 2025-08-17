@@ -53,6 +53,8 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.16.8'
     implementation 'io.lettuce:lettuce-core:6.8.0.RELEASE'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation 'org.springframework.integration:spring-integration-redis'
 }
 
 tasks.named('test') {
