@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ${app_name:${APP_NAME:examples})}
+  redis:
+    cluster:
+      nodes: 192.168.10.107:6379,192.168.10.107:6380,192.168.10.107:6381,192.168.10.109:6379,192.168.10.109:6380,192.168.10.109:6381
+    password: drk@2025
+    lettuce:
+      pool:
+        max-idle: 8
+        max-active: 16
+        max-wait: 100000
