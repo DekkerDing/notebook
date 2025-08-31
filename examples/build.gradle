@@ -48,7 +48,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
-
+    implementation 'com.alibaba:QLExpress:3.3.4'
+    implementation 'net.bytebuddy:byte-buddy:1.17.7'
 }
 
 tasks.named('test') {
