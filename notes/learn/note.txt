@@ -1299,3 +1299,5 @@ Completion Suggester
 
 FST
     把原字典文件进行压缩基于字符前缀+后缀进行Node节点排列
+
+searchafter

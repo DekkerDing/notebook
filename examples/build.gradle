@@ -40,7 +40,10 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.14'
@@ -48,7 +51,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
-
+    implementation 'co.elastic.clients:elasticsearch-java:8.18.8'
+    implementation("org.elasticsearch.client:elasticsearch-rest-client:8.18.8")
+    implementation'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 }
 
 tasks.named('test') {
