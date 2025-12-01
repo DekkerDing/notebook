@@ -11,8 +11,6 @@ import org.elasticsearch.core.Map;
 
 @Slf4j
 public class EsCurlInfoUtil {
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
 
     private static final ObjectMapper JACKSON = new ObjectMapper();
     private static final JacksonJsonpMapper MAPPER = new JacksonJsonpMapper();
