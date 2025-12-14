@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ElasticsearchConfig {
-    @Value("${elasticsearch.url:http://localhost:9200}")
+    @Value("${elasticsearch.url:http://192.168.10.107:9200}")
     private String elasticsearchUrl;
     @Bean
     ElasticsearchClient elasticsearchClient(){
