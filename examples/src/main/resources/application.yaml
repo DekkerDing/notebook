@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ${app_name:${APP_NAME:examples})}
+  elasticsearch:
+    uris: http://192.168.10.107:9200
+    connection-timeout: 5s
+    socket-timeout: 30s

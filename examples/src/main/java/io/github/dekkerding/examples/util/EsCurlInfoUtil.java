@@ -6,7 +6,6 @@ import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.core.Map;
 
 @Slf4j
 public class EsCurlInfoUtil {
@@ -98,18 +97,18 @@ public class EsCurlInfoUtil {
             // 提取 update 内容：doc / script
             Object updateSource = null;
 
-            if (request.doc() != null) {
-                updateSource = Map.of(
-                        "doc", request.doc(),
-                        "doc_as_upsert", request.docAsUpsert() != null && request.docAsUpsert()
-                );
-            } else if (request.script() != null) {
-                updateSource = Map.of(
-                        "script", request.script().source()
-                );
-            } else {
-                updateSource = Map.of("doc", Map.of());
-            }
+//            if (request.doc() != null) {
+//                updateSource = Map..of(
+//                        "doc", request.doc(),
+//                        "doc_as_upsert", request.docAsUpsert() != null && request.docAsUpsert()
+//                );
+//            } else if (request.script() != null) {
+//                updateSource = Map.of(
+//                        "script", request.script().source()
+//                );
+//            } else {
+//                updateSource = Map.of("doc", Map.of());
+//            }
 
             // 转换为 JSON 并压缩为单行
             String jsonBody = toJson(updateSource);
