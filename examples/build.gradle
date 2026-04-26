@@ -40,6 +40,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
@@ -49,12 +51,12 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
     implementation 'org.redisson:redisson:3.16.8'
-    //implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
     implementation 'org.redisson:redisson-spring-boot-starter:3.16.8'
     implementation 'io.lettuce:lettuce-core:6.8.0.RELEASE'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     implementation 'org.springframework.boot:spring-boot-starter-integration'
     implementation 'org.springframework.integration:spring-integration-redis'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 tasks.named('test') {
