@@ -56,14 +56,6 @@ public class DynamicStreamManager {
                 // 使用菱形操作符简化代码
                 // ✅ 创建 StreamOffset，指定 key 类型为 String
                 StreamOffset<String> offset = StreamOffset.<String>create(streamKey, ReadOffset.lastConsumed());
-
-//                StreamMessageListenerContainer.StreamReadRequest request =
-//                        StreamMessageListenerContainer.StreamReadRequest.builder(offset)
-//                                .consumer(Consumer.from(group, consumer))
-//                                .autoAcknowledge(false)
-//                                .errorHandler(e -> log.error("消费异常", e))
-//                                .build();
-
                 Subscription subscription = container.receive(offset, this::handleMessage);
 
                 subscriptionHolder.put(subscriptionId, subscription);
