@@ -55,16 +55,26 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.6.14'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
     implementation 'org.redisson:redisson:3.16.8'
     implementation 'org.redisson:redisson-spring-boot-starter:3.16.8'
     implementation 'io.lettuce:lettuce-core:6.8.0.RELEASE'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.13.4'
     implementation 'org.springframework.boot:spring-boot-starter-integration'
     implementation 'org.springframework.integration:spring-integration-redis'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Hutool工具类
+    implementation 'cn.hutool:hutool-all:5.8.10'
+    // Caffeine缓存(用于幂等性)
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+    // Apache Commons Pool2 (用于对象池)
+    implementation 'org.apache.commons:commons-pool2:2.11.1'
+    // Snappy压缩
+    implementation 'org.xerial.snappy:snappy-java:1.1.8.4'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 tasks.named('test') {
@@ -94,7 +104,13 @@ bootJar {
 
 configurations.all() {
     Configuration configuration ->
-        configuration.resolutionStrategy.failOnVersionConflict()
+        resolutionStrategy {
+            force 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+            force 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
+            force 'com.fasterxml.jackson.core:jackson-annotations:2.13.4'
+            force 'org.scala-lang:scala-library:2.13.4'
+            force 'org.scala-lang:scala-reflect:2.13.4'
+        }
 }
 
 gradle.projectsEvaluated {

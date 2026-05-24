@@ -1,0 +1,56 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::               (v2.6.14)
+
+2026-05-24 21:39:40.538  INFO 65792 --- [           main] i.g.d.examples.ExamplesApplication       : Starting ExamplesApplication using Java 1.8.0_301 on DESKTOP-G3UB7D4 with PID 65792 (F:\workspace\notebook\examples\build\libs\examples-1.0-SNAPSHOT.jar started by Ding in F:\workspace\notebook\examples)
+2026-05-24 21:39:40.545  INFO 65792 --- [           main] i.g.d.examples.ExamplesApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-05-24 21:39:42.108  INFO 65792 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-24 21:39:42.113  INFO 65792 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-24 21:39:42.211  INFO 65792 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 0 Redis repository interfaces.
+2026-05-24 21:39:42.524  INFO 65792 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'redisStreamEventAutoConfiguration' of type [io.github.dekkerding.examples.config.RedisStreamEventAutoConfiguration$$EnhancerBySpringCGLIB$$743cf789] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-05-24 21:39:42.552  INFO 65792 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.redis.stream.event-io.github.dekkerding.examples.config.RedisStreamEventProperties' of type [io.github.dekkerding.examples.config.RedisStreamEventProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-05-24 21:39:42.569  INFO 65792 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'eventStreamRouter' of type [io.github.dekkerding.examples.infrastructure.routing.EventStreamRouter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-05-24 21:39:42.581  INFO 65792 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.integration.config.IntegrationManagementConfiguration' of type [org.springframework.integration.config.IntegrationManagementConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-05-24 21:39:42.594  INFO 65792 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'integrationChannelResolver' of type [org.springframework.integration.support.channel.BeanFactoryChannelResolver] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2026-05-24 21:39:44.081  INFO 65792 --- [           main] org.redisson.Version                     : Redisson 3.16.8
+2026-05-24 21:39:46.818  INFO 65792 --- [           main] o.r.cluster.ClusterConnectionManager     : Redis cluster nodes configuration got from 192.168.10.109/192.168.10.109:6379:
+73f279855a4e45fe2ce5c206cb9c0a81b05ec3bb 192.168.10.107:6380@16380 slave 888d735765c785def93feaa30e7f47edb9218d36 0 1779629985659 2 connected
+e601e1781c6392282ecb84c8b2bac3ec2dacca8d 192.168.10.107:6379@16379 slave 73ff49f290d575a8400b100fe64908861e123327 0 1779629985555 7 connected
+73ff49f290d575a8400b100fe64908861e123327 192.168.10.109:6381@16381 master - 0 1779629986568 7 connected 5461-10922
+66f66a74727d689fa11fc2cc95385428d0ca3b54 192.168.10.109:6379@16379 myself,master - 0 0 1 connected 0-5460
+b73bc0d011407fffa13a33472a1cb30d75e4564b 192.168.10.107:6381@16381 slave 66f66a74727d689fa11fc2cc95385428d0ca3b54 0 1779629985046 1 connected
+888d735765c785def93feaa30e7f47edb9218d36 192.168.10.109:6380@16380 master - 0 1779629986669 2 connected 10923-16383
+
+2026-05-24 21:39:46.911  INFO 65792 --- [sson-netty-2-13] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for 192.168.10.109/192.168.10.109:6380
+2026-05-24 21:39:46.942  INFO 65792 --- [sson-netty-2-17] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for 192.168.10.109/192.168.10.109:6381
+2026-05-24 21:39:46.960  INFO 65792 --- [sson-netty-2-18] o.r.c.pool.MasterPubSubConnectionPool    : 1 connections initialized for 192.168.10.109/192.168.10.109:6379
+2026-05-24 21:39:47.002  INFO 65792 --- [isson-netty-2-3] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for 192.168.10.109/192.168.10.109:6379
+2026-05-24 21:39:47.009  INFO 65792 --- [isson-netty-2-9] o.r.c.pool.PubSubConnectionPool          : 1 connections initialized for 192.168.10.107/192.168.10.107:6381
+2026-05-24 21:39:47.013  INFO 65792 --- [sson-netty-2-32] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for 192.168.10.109/192.168.10.109:6381
+2026-05-24 21:39:47.020  INFO 65792 --- [sson-netty-2-10] o.r.c.pool.MasterConnectionPool          : 24 connections initialized for 192.168.10.109/192.168.10.109:6380
+2026-05-24 21:39:47.026  INFO 65792 --- [sson-netty-2-13] o.r.c.pool.PubSubConnectionPool          : 1 connections initialized for 192.168.10.107/192.168.10.107:6379
+2026-05-24 21:39:47.036  INFO 65792 --- [isson-netty-2-1] o.r.c.pool.PubSubConnectionPool          : 1 connections initialized for 192.168.10.107/192.168.10.107:6380
+2026-05-24 21:39:47.039  INFO 65792 --- [isson-netty-2-5] o.r.cluster.ClusterConnectionManager     : slaves: [redis://192.168.10.107:6381] added for slot ranges: [[0-5460]]
+2026-05-24 21:39:47.039  INFO 65792 --- [isson-netty-2-5] o.r.cluster.ClusterConnectionManager     : master: redis://192.168.10.109:6379 added for slot ranges: [[0-5460]]
+2026-05-24 21:39:47.039  INFO 65792 --- [isson-netty-2-5] o.r.connection.pool.SlaveConnectionPool  : 24 connections initialized for 192.168.10.107/192.168.10.107:6381
+2026-05-24 21:39:47.044  INFO 65792 --- [sson-netty-2-32] o.r.cluster.ClusterConnectionManager     : slaves: [redis://192.168.10.107:6379] added for slot ranges: [[5461-10922]]
+2026-05-24 21:39:47.044  INFO 65792 --- [sson-netty-2-32] o.r.cluster.ClusterConnectionManager     : master: redis://192.168.10.109:6381 added for slot ranges: [[5461-10922]]
+2026-05-24 21:39:47.044  INFO 65792 --- [sson-netty-2-32] o.r.connection.pool.SlaveConnectionPool  : 24 connections initialized for 192.168.10.107/192.168.10.107:6379
+2026-05-24 21:39:47.052  INFO 65792 --- [sson-netty-2-22] o.r.cluster.ClusterConnectionManager     : slaves: [redis://192.168.10.107:6380] added for slot ranges: [[10923-16383]]
+2026-05-24 21:39:47.053  INFO 65792 --- [sson-netty-2-22] o.r.cluster.ClusterConnectionManager     : master: redis://192.168.10.109:6380 added for slot ranges: [[10923-16383]]
+2026-05-24 21:39:47.053  INFO 65792 --- [sson-netty-2-22] o.r.connection.pool.SlaveConnectionPool  : 24 connections initialized for 192.168.10.107/192.168.10.107:6380
+2026-05-24 21:39:47.258  INFO 65792 --- [           main] i.g.d.e.i.c.DynamicConfigurationManager  : 配置监听器已启动
+2026-05-24 21:39:47.260  INFO 65792 --- [           main] i.g.d.e.i.c.DynamicConfigurationManager  : 动态配置管理器已初始化
+2026-05-24 21:39:47.262  INFO 65792 --- [           main] g.d.e.i.s.HighPerformanceEventSerializer : 高性能序列化器已初始化，预注册5个常用类型
+2026-05-24 21:39:47.281  INFO 65792 --- [           main] f.a.AutowiredAnnotationBeanPostProcessor : Inconsistent constructor declaration on bean with name 'businessProcessorFactory': single autowire-marked constructor flagged as optional - this constructor is effectively required since there is no default constructor to fall back to: public io.github.dekkerding.examples.producer.BusinessProcessorFactory(java.util.List)
+2026-05-24 21:39:47.283  WARN 65792 --- [           main] i.g.d.e.p.BusinessProcessorFactory       : 未发现任何 BusinessProcessor 实现
+2026-05-24 21:39:48.227  INFO 65792 --- [           main] i.g.d.e.i.c.ConsumerGroupInitializer     : ? 开始初始化 Stream 事件消费者...
+2026-05-24 21:39:48.227  INFO 65792 --- [           main] i.g.d.e.i.c.ConsumerGroupInitializer     : ? Stream 事件消费者初始化完成，共启动 0 个消费者
+2026-05-24 21:39:48.254  INFO 65792 --- [           main] i.g.d.examples.ExamplesApplication       : Started ExamplesApplication in 8.74 seconds (JVM running for 9.702)
+2026-05-24 21:39:48.258  INFO 65792 --- [           main] i.g.d.e.application.JitWarmupRunner      : 开始JIT预热...
+2026-05-24 21:39:48.259  WARN 65792 --- [           main] i.g.d.e.application.JitWarmupRunner      : JIT预热失败，将继续运行: null source

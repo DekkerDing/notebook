@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.stream.MapRecord;
-import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 import java.io.IOException;
@@ -50,16 +48,6 @@ public class RedissonConfiguration {
     @Bean
     public RedisLockRegistry redisLockRegistry(RedisConnectionFactory factory) {
         return new RedisLockRegistry(factory, keyPrefix + "lock");
-    }
-
-    @Bean
-    public StreamMessageListenerContainer<String, MapRecord<String, String, String>> streamContainer(
-            RedisConnectionFactory factory) {
-        // 使用默认配置创建容器
-        StreamMessageListenerContainer<String, MapRecord<String, String, String>> container =
-                StreamMessageListenerContainer.create(factory);
-        container.start();
-        return container;
     }
 
 }

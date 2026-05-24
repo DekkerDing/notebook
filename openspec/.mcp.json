@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "antd": {
+      "command": "antd",
+      "args": ["mcp", "--version", "5.20.0"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}

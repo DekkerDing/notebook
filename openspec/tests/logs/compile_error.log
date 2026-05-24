@@ -1,0 +1,26 @@
+
+> Task :compileJava
+F:\workspace\notebook\examples\src\main\java\io\github\dekkerding\examples\infrastructure\publisher\PipelineRedisStreamPublisher.java:112: 错误: 找不到符号
+            return Collections.singletonList(publishSync(envelopes.get(0), streamKey));
+                   ^
+  符号:   变量 Collections
+  位置: 类 PipelineRedisStreamPublisher
+1 个错误
+
+> Task :compileJava FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 5s
+1 actionable task: 1 executed

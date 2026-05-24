@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: ${app_name:${APP_NAME:examples}}
+  redis:
+    cluster:
+      nodes: 192.168.10.107:6379,192.168.10.107:6380,192.168.10.107:6381,192.168.10.109:6379,192.168.10.109:6380,192.168.10.109:6381
+    password: drk@2025
+    lettuce:
+      pool:
+        max-idle: 8
+        max-active: 16
+        max-wait: 100000
+    key-prefix: "examplesApplication:"
+    stream:
+      event:
+        enabled: true
+        key-prefix: "examplesApplication:stream:"
+        default-group: "default-group"
+        consumer-name: "examples-consumer"
+        poll-timeout: 2000
+        batch-size: 10
+        # 分区配置（Kafka功能）
+        partition:
+          enabled: true
+          count: 3
+          strategy: hash  # round_robin, hash
+        # 幂等性配置（Kafka功能）
+        idempotent:
+          enabled: true
+          key-ttl: 86400  # 24小时
+        # 消费者组配置
+        consumer-group:
+          auto-balance: true
+          rebalance-timeout: 60
+          heartbeat-interval: 10
+        # 消息回溯配置
+        rewind:
+          enabled: true
+          max-history-days: 7
+        # 重试配置
+        retry:
+          max-attempts: 3
+          initial-interval: 1000
+          backoff-multiplier: 2.0
+        # DLQ配置
+        dlq:
+          enabled: true
+          key-prefix: "examplesApplication:dlq:"
+        routes: {}
+
+# Actuator 健康检查
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# 日志配置
+logging:
+  level:
+    io.github.dekkerding.examples: DEBUG
+    org.springframework.data.redis: WARN

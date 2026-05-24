@@ -1,0 +1,15 @@
+package io.github.dekkerding.examples.domain.exception;
+
+/**
+ * 事件序列化/反序列化异常
+ */
+public class EventSerializationException extends RuntimeException {
+
+    public EventSerializationException(String message) {
+        super(message);
+    }
+
+    public EventSerializationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

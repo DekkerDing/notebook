@@ -1,0 +1,92 @@
+> Task :clean
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+
+> Task :test
+
+IdempotentRegressionTest > IT-清理和统计测试 > IT-007: 清理已处理记录 FAILED
+    org.opentest4j.AssertionFailedError at IdempotentRegressionTest.java:390
+
+IdempotentRegressionTest > IT-清理和统计测试 > IT-Stats: 获取已处理消息统计 FAILED
+    org.opentest4j.AssertionFailedError at IdempotentRegressionTest.java:416
+
+IdempotentRegressionTest > IT-批量操作测试 > IT-008: 批量幂等性检查 FAILED
+    org.opentest4j.AssertionFailedError at IdempotentRegressionTest.java:362
+
+IdempotentRegressionTest > IT-分布式幂等性测试 > IT-003: 分布式幂等性 - 多消费者只处理一次 FAILED
+    org.opentest4j.AssertionFailedError at IdempotentRegressionTest.java:187
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+*** java.lang.instrument ASSERTION FAILED ***: "!errorOutstanding" with message transform method call failed at JPLISAgent.c line: 844
+
+PerformanceRegressionTest > CC-并发测试 > CC-001: 并发发布测试 FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:247
+
+PerformanceRegressionTest > CC-并发测试 > CC-004: 并发幂等性测试 FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:289
+
+PerformanceRegressionTest > LT-延迟测试 > LT-001: 端到端延迟测试 FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:157
+
+PerformanceRegressionTest > TP-吞吐量测试 > TP-001: 小消息吞吐量测试 (1KB) FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:70
+
+PerformanceRegressionTest > TP-吞吐量测试 > TP-002: 中消息吞吐量测试 (10KB) FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:95
+
+PerformanceRegressionTest > TP-吞吐量测试 > TP-004: 分区吞吐量测试 FAILED
+    org.opentest4j.AssertionFailedError at PerformanceRegressionTest.java:126
+
+Redisson功能回归测试 > K8S: Kubernetes场景综合测试 > K8S-001: Pod间配置共享测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:766
+
+Redisson功能回归测试 > FN-RATOMIC: 原子操作测试 > FN-RATOMIC-002: RBitSet位操作测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:656
+
+Redisson功能回归测试 > FN-RSSORT: 有序集合测试 > FN-RSSORT-001: 有序集合基本操作和排名测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:358
+
+Redisson功能回归测试 > FN-RSET: 分布式Set测试 > FN-RSET-002: RSet集合运算测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:305
+
+Redisson功能回归测试 > FN-RSET: 分布式Set测试 > FN-RSET-001: RSet基本操作和去重测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:233
+
+Redisson功能回归测试 > FN-RMAP: 分布式Map测试 > FN-RMAP-001: RMap基本操作测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:84
+
+Redisson功能回归测试 > FN-RMAP: 分布式Map测试 > FN-RMAP-002: RMap批量操作测试 FAILED
+    org.opentest4j.AssertionFailedError at RedissonFeaturesRegressionTest.java:136
+2026-05-24 17:48:55.315  INFO 45004 --- [ionShutdownHook] i.g.d.e.i.c.ConsumerGroupInitializer     : ? 停止所有 Stream 事件消费者...
+2026-05-24 17:48:55.327  INFO 45004 --- [ionShutdownHook] i.g.d.e.i.c.DynamicConfigurationManager  : 动态配置管理器已销毁
+
+51 tests completed, 17 failed
+
+> Task :test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///F:/workspace/notebook/examples/build/reports/tests/test/index.html
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 2m 17s
+5 actionable tasks: 5 executed

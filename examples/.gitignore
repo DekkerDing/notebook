@@ -37,3 +37,16 @@ out/
 .vscode/
 !/gradlew
 !/gradlew.bat
+
+### 临时日志和编译产物 ###
+*.log
+*.txt
+!README.md
+!CLAUDE.md
+!**/src/main/**/*.txt
+!**/src/test/**/*.txt
+
+### 环境配置 ###
+.env
+.env.local
+.env.*.local
