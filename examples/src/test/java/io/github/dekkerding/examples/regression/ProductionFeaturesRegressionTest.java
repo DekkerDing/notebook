@@ -431,6 +431,71 @@ public class ProductionFeaturesRegressionTest {
                 orderId, paymentId, refundId, userId, txnId);
     }
 
+    @Test
+    @Order(25)
+    @DisplayName("ID-006: 批量ID生成测试")
+    void testBatchIdGeneration() {
+        String key = "test:batch:id:" + System.currentTimeMillis();
+
+        try {
+            // 批量生成5个ID
+            int batchSize = 5;
+            long startId = idGeneratorService.nextIdBatch(key, batchSize);
+
+            // 验证批量生成的起始ID
+            assertTrue(startId >= 1, "起始ID应该大于等于1");
+
+            // 验证后续ID是连续的
+            long nextId = idGeneratorService.nextId(key);
+            assertEquals(startId + batchSize, nextId, "下一个ID应该是批量ID的最后一个加1");
+
+            log.info("批量ID生成测试通过: startId={}, batchSize={}, nextId={}", startId, batchSize, nextId);
+        } finally {
+            // 清理
+            try {
+                // Redisson会自动清理，这里不需要特别处理
+            } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("ID-007: ID状态查询测试")
+    void testIdStateQuery() {
+        String key = "test:id:state:" + System.currentTimeMillis();
+
+        try {
+            // 查询初始ID值（序列不存在时应该返回0）
+            long initialId = idGeneratorService.currentId(key);
+            assertEquals(0, initialId, "序列不存在时应该返回0");
+
+            // 生成一个ID
+            long generatedId = idGeneratorService.nextId(key);
+            assertTrue(generatedId >= 1, "生成的ID应该大于等于1");
+
+            // 查询当前ID值
+            long currentId = idGeneratorService.currentId(key);
+            assertEquals(generatedId, currentId, "当前ID应该等于最后生成的ID");
+
+            // 设置ID值
+            long newValue = 100L;
+            idGeneratorService.setId(key, newValue);
+            assertEquals(newValue, idGeneratorService.currentId(key), "设置后ID值应该等于新值");
+
+            // 下一个ID应该是设置值+1
+            long nextId = idGeneratorService.nextId(key);
+            assertEquals(newValue + 1, nextId, "下一个ID应该是设置值加1");
+
+            log.info("ID状态查询测试通过: initialId={}, generatedId={}, currentId={}, nextId={}",
+                    initialId, generatedId, currentId, nextId);
+        } finally {
+            // 清理
+            try {
+                // Redisson会自动清理，这里不需要特别处理
+            } catch (Exception ignored) {}
+        }
+    }
+
     // ==================== 两级缓存测试 ====================
 
     @Test
@@ -539,6 +604,107 @@ public class ProductionFeaturesRegressionTest {
         // 清理
         cacheService.delete("test:batch:3");
         log.info("批量删除测试通过");
+    }
+
+    @Test
+    @Order(24)
+    @DisplayName("LOCK-005: 公平锁测试")
+    void testFairLock() {
+        String lockKey = "test:fair:lock:" + System.currentTimeMillis();
+
+        try {
+            // 获取公平锁
+            boolean acquired = distributedLockService.tryFairLock(lockKey, 5, 30, TimeUnit.SECONDS);
+            assertTrue(acquired, "应该成功获取公平锁");
+
+            // 验证锁状态
+            assertTrue(distributedLockService.isLocked(lockKey), "锁应该处于锁定状态");
+            assertTrue(distributedLockService.isHeldByCurrentThread(lockKey), "锁应该被当前线程持有");
+
+            // 释放锁
+            distributedLockService.unlock(lockKey);
+
+            // 验证锁已释放
+            assertFalse(distributedLockService.isLocked(lockKey), "锁应该已释放");
+
+            log.info("公平锁测试通过: key={}", lockKey);
+        } catch (Exception e) {
+            // 清理锁
+            try {
+                distributedLockService.forceUnlock(lockKey);
+            } catch (Exception ignored) {}
+            throw e;
+        }
+    }
+
+    @Test
+    @Order(25)
+    @DisplayName("LOCK-006: 强制释放锁测试")
+    void testForceUnlock() {
+        String lockKey = "test:force:unlock:" + System.currentTimeMillis();
+
+        try {
+            // 获取锁
+            boolean acquired = distributedLockService.tryLock(lockKey, 5, 30, TimeUnit.SECONDS);
+            assertTrue(acquired, "应该成功获取锁");
+
+            // 验证锁状态
+            assertTrue(distributedLockService.isLocked(lockKey), "锁应该处于锁定状态");
+
+            // 强制释放锁
+            distributedLockService.forceUnlock(lockKey);
+
+            // 验证锁已释放
+            assertFalse(distributedLockService.isLocked(lockKey), "强制释放后锁应该不存在");
+
+            // 再次强制释放不应该抛出异常
+            distributedLockService.forceUnlock(lockKey);
+
+            log.info("强制释放锁测试通过: key={}", lockKey);
+        } catch (Exception e) {
+            // 清理锁
+            try {
+                distributedLockService.forceUnlock(lockKey);
+            } catch (Exception ignored) {}
+            throw e;
+        }
+    }
+
+    @Test
+    @Order(26)
+    @DisplayName("LOCK-007: 锁重入性测试")
+    void testReentrantLock() {
+        String lockKey = "test:reentrant:lock:" + System.currentTimeMillis();
+
+        try {
+            // 第一次获取锁
+            boolean acquired1 = distributedLockService.tryLock(lockKey, 5, 30, TimeUnit.SECONDS);
+            assertTrue(acquired1, "第一次应该成功获取锁");
+
+            // 第二次获取锁（重入）
+            boolean acquired2 = distributedLockService.tryLock(lockKey, 5, 30, TimeUnit.SECONDS);
+            assertTrue(acquired2, "第二次应该成功获取锁（重入）");
+
+            // 验证锁状态
+            assertTrue(distributedLockService.isLocked(lockKey), "锁应该处于锁定状态");
+            assertTrue(distributedLockService.isHeldByCurrentThread(lockKey), "锁应该被当前线程持有");
+
+            // 释放锁（第一次）
+            distributedLockService.unlock(lockKey);
+            assertTrue(distributedLockService.isLocked(lockKey), "释放一次后锁仍应处于锁定状态（重入计数减1）");
+
+            // 释放锁（第二次）
+            distributedLockService.unlock(lockKey);
+            assertFalse(distributedLockService.isLocked(lockKey), "释放两次后锁应该完全释放");
+
+            log.info("锁重入性测试通过: key={}", lockKey);
+        } catch (Exception e) {
+            // 清理锁
+            try {
+                distributedLockService.forceUnlock(lockKey);
+            } catch (Exception ignored) {}
+            throw e;
+        }
     }
 
     // ==================== 综合场景测试 ====================
