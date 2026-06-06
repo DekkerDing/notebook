@@ -1,0 +1,60 @@
+# 测试环境Redis配置 - 支持单机模式
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  redis:
+    # 使用环境变量REDIS_HOST指定Redis主机，默认为localhost
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    timeout: 10s
+    lettuce:
+      pool:
+        max-idle: 8
+        max-active: 16
+        max-wait: 100000
+    key-prefix: "${REDIS_KEY_PREFIX:examplesApplication:test:}"
+    stream:
+      event:
+        enabled: ${REDIS_STREAM_ENABLED:true}
+        key-prefix: "${REDIS_STREAM_KEY_PREFIX:examplesApplication:stream:}"
+        default-group: "${REDIS_STREAM_GROUP:default-group}"
+        consumer-name: "${REDIS_STREAM_CONSUMER:examples-consumer}"
+        poll-timeout: ${REDIS_STREAM_POLL_TIMEOUT:2000}
+        batch-size: ${REDIS_STREAM_BATCH_SIZE:10}
+        partition:
+          enabled: ${REDIS_PARTITION_ENABLED:false}
+          count: ${REDIS_PARTITION_COUNT:3}
+          strategy: ${REDIS_PARTITION_STRATEGY:hash}
+        idempotent:
+          enabled: ${REDIS_IDEMPOTENT_ENABLED:true}
+          key-ttl: ${REDIS_IDEMPOTENT_TTL:86400}
+        retry:
+          max-attempts: ${REDIS_RETRY_MAX_ATTEMPTS:3}
+          initial-interval: ${REDIS_RETRY_INITIAL_INTERVAL:1000}
+          backoff-multiplier: ${REDIS_RETRY_BACKOFF_MULTIPLIER:2.0}
+        dlq:
+          enabled: ${REDIS_DLQ_ENABLED:true}
+          key-prefix: "${REDIS_DLQ_KEY_PREFIX:examplesApplication:dlq:}"
+        routes: {}
+
+# Actuator 健康检查
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:false}
+
+# 日志配置
+logging:
+  level:
+    io.github.dekkerding.examples: ${LOG_LEVEL:DEBUG}
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:WARN}
+    org.springframework.integration: ${INTEGRATION_LOG_LEVEL:WARN}
