@@ -1,0 +1,78 @@
+elasticsearch:
+  host: 192.168.10.107
+  port: 9200
+  scheme: http
+  username: elastic
+  password: changeme
+  connect-timeout: 5000
+  socket-timeout: 30000
+  vector-index-name: kb_vector_index
+  vector-dimension: 1536
+  similarity: cosine
+  hnsw:
+    m: 16
+    ef-construction: 100
+    ef-search: 50
+  index-optimization:
+    refresh-interval: 30
+    bulk-min-size: 500
+    bulk-max-size: 2000
+    thread-pool-size: 4
+    queue-capacity: 1000
+    index-timeout: 60
+
+graph:
+  type: MEMORY
+  neo4j:
+    host: localhost
+    port: 7687
+    scheme: bolt://
+    username: neo4j
+    password: password
+    database: neo4j
+    connection-timeout: 5000
+  entity-extraction:
+    enabled: true
+    confidence-threshold: 0.7
+    max-entities: 1000
+    supported-types: PERSON,ORG,LOC,DATE,NUMBER
+    use-nlp: false
+  relation-extraction:
+    enabled: true
+    confidence-threshold: 0.6
+    max-relations: 2000
+    max-hops: 3
+
+spring:
+  application:
+    name: notebook-examples
+
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/notebook?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+    io.github.dekkerding.examples: DEBUG
+    org.springframework: INFO
+    org.hibernate: INFO
+
+server:
+  port: 8080

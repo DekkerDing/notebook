@@ -42,15 +42,39 @@ repositories {
 dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5'
+
+    // Monitoring (Micrometer)
+    implementation 'io.micrometer:micrometer-core:1.9.15'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.9.15'
+
+    // Database
+    runtimeOnly 'mysql:mysql-connector-java:8.0.30'
+    runtimeOnly 'com.h2database:h2:2.1.214'
+
+    // Document Parser
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.poi:poi-scratchpad:5.2.3'
+
+    // Graph Storage (Neo4j)
+    implementation 'org.neo4j.driver:neo4j-java-driver:4.4.9'
+
+    // Graph Library (JGraphT for in-memory graph) - Java 8 compatible version
+    implementation 'org.jgrapht:jgrapht-core:1.3.0'
 
 }
 

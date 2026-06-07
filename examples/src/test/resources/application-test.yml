@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: examples-test
+
+elasticsearch:
+  host: 192.168.10.107
+  port: 9200
+  scheme: http
+  vector-index-name: kb_vector_index
+  vector-dimension: 1536
+  similarity: cosine
+  connect-timeout: 5000
+  socket-timeout: 30000

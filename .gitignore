@@ -1,2 +1,129 @@
-/.idea
-/out
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IntelliJ
+out/
+*.ipr
+*.iml
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Compiled Source
+*.class
+*.jar
+*.war
+*.ear
+
+# Package Files
+*.zip
+*.tar.gz
+*.rar
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Spring Boot
+/spring-boot-starter/
+
+# Application
+application-local.yml
+application-local.properties
+*.local.yml
+*.local.properties
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Test Coverage
+*.exec
+jacoco/
+.jacoco/
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Build
+/target/
+/build/
+
+# Claude
+.claude/memory/
+
+# Memory and Swap
+*.swap
+*.mem
+
+# Debug
+hs_err_pid*
+replay_pid*
+
+# Maven
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Logs
+logs/
+*.log
+
+# Package Files
+*.war
+*.ear
+
+# Virtual machine crash logs
+hs_err_pid*
