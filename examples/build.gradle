@@ -60,6 +60,9 @@ dependencies {
     implementation 'io.micrometer:micrometer-core:1.9.15'
     implementation 'io.micrometer:micrometer-registry-prometheus:1.9.15'
 
+    // Caffeine Cache
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+
     // Database
     runtimeOnly 'mysql:mysql-connector-java:8.0.30'
     runtimeOnly 'com.h2database:h2:2.1.214'

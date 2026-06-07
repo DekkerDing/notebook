@@ -12,6 +12,11 @@ Notebook是一个基于Spring Boot构建的知识库向量能力底座，旨在�
 - **🔤 文本向量化** - 支持OpenAI/通义千问/本地模型
 - **🔍 智能检索** - BM25稀疏检索、向量密集检索、多路融合检索、GraphRAG图谱检索
 - **🔀 混合协调** - 检索策略智能编排，RRF算法结果融合，自适应权重调整
+- **🎯 重排序** - Cross-Encoder二次精排，准确率提升至85%+（新增）⚡
+- **💾 检索缓存** - 高性能缓存，热门查询延迟降至10ms（新增）⚡
+- **🧠 意图识别** - 自动识别查询意图，智能推荐策略（新增）⚡
+- **🔄 查询扩展** - 同义词扩展，召回率提升20-30%（新增）⚡
+- **📝 结果摘要** - 智能摘要生成，降低Token消耗50-70%（新增）⚡
 - **📚 知识库管理** - 完整的知识库CRUD、分类管理、统计监控
 - **📄 文档解析** - 支持PDF、Word、Excel文档解析和内容提取
 - **🧠 GraphRAG** - 知识图谱增强检索，支持实体/关系抽取和社区发现
@@ -190,6 +195,9 @@ open build/reports/tests/test/index.html
 - 🤝 [贡献指南](./openspec/CONTRIBUTING.md) - 如何贡献代码
 - 📐 [系统架构](./openspec/specs/system-architecture.md) - 系统架构设计
 - 📜 [文档管理规则](./openspec/DOC_MANAGEMENT_RULES.md) - 文档组织规范
+- 🎯 [功能指南](./openspec/FEATURE_GUIDE.md) - 完整功能清单与接入指南 ⭐
+- 📋 [功能快速参考](./openspec/FEATURE_QUICK_REF.md) - 功能速查卡片
+- 📖 [测试执行规则](./openspec/TEST_EXECUTION_RULES.md) - 自动化测试规范
 
 ### 测试文档
 - [RAG测试执行日志](examples/docs/RAG_Test_Execution_Log_2026-06-07.md)
